@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Prince Meal Plan</title>
   
+  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="application-name" content="Prince Meal Plan">
@@ -17,9 +18,7 @@
       darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            brand: { red: '#E31837', blue: '#005DAA', green: '#16a34a' }
-          }
+          colors: { brand: { red: '#E31837', blue: '#005DAA', green: '#16a34a' } }
         }
       }
     }
@@ -45,13 +44,11 @@
       </div>
       
       <div class="flex items-center gap-2">
-        <!-- Cloud Sync Pill -->
         <button type="button" onclick="openCloudModal()" id="cloudStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
           <span id="cloudStatusText">Local Mode</span>
         </button>
 
-        <!-- Dark Mode Toggle -->
         <button type="button" onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">
           <span id="themeIcon">🌙</span>
         </button>
@@ -59,36 +56,49 @@
     </div>
   </header>
 
-  <!-- Navigation Tabs -->
+  <!-- Navigation Tabs (4 Tabs) -->
   <nav class="sticky top-[57px] z-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2">
-    <div class="max-w-xl mx-auto grid grid-cols-3 gap-2">
-      <button type="button" onclick="switchTab('tab-groceries')" id="btn-groceries" class="tab-btn py-2 text-xs font-bold rounded-lg bg-red-600 text-white shadow-sm">1. Groceries</button>
-      <button type="button" onclick="switchTab('tab-family')" id="btn-family" class="tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">2. Family & Gear</button>
-      <button type="button" onclick="switchTab('tab-plan')" id="btn-plan" class="tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">3. 7 Dinners</button>
+    <div class="max-w-xl mx-auto grid grid-cols-4 gap-1.5">
+      <button type="button" onclick="switchTab('tab-groceries')" id="btn-groceries" class="tab-btn py-2 text-[11px] font-bold rounded-lg bg-red-600 text-white shadow-sm">1. Haul</button>
+      <button type="button" onclick="switchTab('tab-pantry')" id="btn-pantry" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">2. Pantry</button>
+      <button type="button" onclick="switchTab('tab-plan')" id="btn-plan" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">3. Dinners</button>
+      <button type="button" onclick="switchTab('tab-family')" id="btn-family" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">4. Family</button>
     </div>
   </nav>
 
   <!-- Main Content Container -->
   <main class="max-w-xl mx-auto p-4 pb-24 space-y-4">
 
-    <!-- TAB 1: GROCERIES -->
+    <!-- TAB 1: GROCERIES & ACTIVE HAUL -->
     <section id="tab-groceries" class="space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Add Grocery Items</h2>
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add Item or Receipt</h2>
+          <label class="text-xs text-blue-600 dark:text-blue-400 font-bold flex items-center gap-1 cursor-pointer">
+            📷 <span>Snap Photo</span>
+            <input type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
+          </label>
+        </div>
+
         <div class="flex gap-2 mb-3">
-          <input type="text" id="quickItemInput" placeholder="e.g. KS Chicken Breasts, Cheddar..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <input type="text" id="quickItemInput" placeholder="Add grocery or Costco staple..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
           <button type="button" onclick="addManualItem()" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
+        <div class="mb-3">
+          <button type="button" onclick="loadCostcoScannedHaul()" class="w-full py-2 px-3 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>📥</span> Load Scanned Costco Receipts (25+ Items)
+          </button>
+        </div>
+
         <div class="space-y-1.5">
-          <p class="text-[11px] font-semibold text-slate-500">Quick-tap Costco staples:</p>
+          <p class="text-[11px] font-semibold text-slate-500">Quick-tap additions:</p>
           <div class="flex flex-wrap gap-1.5">
-            <button type="button" onclick="quickAdd('KS Chicken Breasts', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Chicken Breasts</button>
-            <button type="button" onclick="quickAdd('Extra Lean Ground Beef 3pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Ground Beef</button>
-            <button type="button" onclick="quickAdd('Atlantic Salmon', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Salmon</button>
-            <button type="button" onclick="quickAdd('Marble Cheddar 2pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Marble Cheddar</button>
-            <button type="button" onclick="quickAdd('Kraft Dinner 24pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Kraft Dinner</button>
-            <button type="button" onclick="quickAdd('Applesnax Apple Sauce', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Applesnax</button>
+            <button type="button" onclick="quickAdd('Kirkland Chicken Breasts', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Chicken</button>
+            <button type="button" onclick="quickAdd('Long English Cucumbers', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Cucumbers</button>
+            <button type="button" onclick="quickAdd('Marble Cheddar 2pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Cheddar</button>
+            <button type="button" onclick="quickAdd('Kraft Dinner 24pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ KD</button>
+            <button type="button" onclick="quickAdd('Homo Milk 4L', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Homo Milk</button>
           </div>
         </div>
       </div>
@@ -105,22 +115,17 @@
       </div>
     </section>
 
-    <!-- TAB 2: FAMILY & GEAR -->
-    <section id="tab-family" class="hidden space-y-4">
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
-        <h2 class="text-sm font-bold">Household Profile</h2>
-        <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs space-y-1">
-          <p class="font-bold text-blue-900 dark:text-blue-300">Family Profile:</p>
-          <p class="text-blue-800 dark:text-blue-400">2 Adults + 1 Child (6 years old)</p>
+    <!-- TAB 2: PERMANENT PANTRY & SPICE INVENTORY -->
+    <section id="tab-pantry" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-sm font-bold">Pantry & Spice Inventory</h2>
+            <p class="text-xs text-slate-500">Persistent stock (won't clear with shopping hauls)</p>
+          </div>
         </div>
-
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">6-Year-Old Serving Rules</h3>
-        <div class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
-          <div class="flex items-center gap-2">✓ Deconstruct mixed meals (no casseroles)</div>
-          <div class="flex items-center gap-2">✓ Serve sauces & gravies in side dip bowls</div>
-          <div class="flex items-center gap-2">✓ Crunchy raw veggies (carrots/cucumbers) on side</div>
-          <div class="flex items-center gap-2">✓ Mild seasoning only</div>
-        </div>
+        <p class="text-[11px] text-slate-500 mb-3">Tap <strong>"Low"</strong> on any spice or staple to automatically send it to your active grocery list.</p>
+        <div id="pantryCategoriesContainer" class="space-y-4"></div>
       </div>
     </section>
 
@@ -129,10 +134,37 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-sm font-extrabold">Weekly Family Dinners</h2>
-          <p class="text-xs text-slate-500">Includes 6yo adaptations & thaw alerts</p>
+          <p class="text-xs text-slate-500">Matched to current Costco haul with 6yo tweaks</p>
         </div>
       </div>
       <div id="dinnerCardsContainer" class="space-y-3"></div>
+    </section>
+
+    <!-- TAB 4: FAMILY & GEAR -->
+    <section id="tab-family" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
+        <h2 class="text-sm font-bold">Household Rules & Cooking Gear</h2>
+        <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs space-y-1">
+          <p class="font-bold text-blue-900 dark:text-blue-300">Family Profile:</p>
+          <p class="text-blue-800 dark:text-blue-400">2 Adults + 1 Child (6 years old)</p>
+        </div>
+
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">6-Year-Old Serving Strategy</h3>
+        <div class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+          <div class="flex items-center gap-2">✓ Deconstruct mixed meals (no casseroles)</div>
+          <div class="flex items-center gap-2">✓ Serve sauces & gravies in side dip bowls</div>
+          <div class="flex items-center gap-2">✓ Crunchy raw veggies (carrots/cucumbers) on side</div>
+          <div class="flex items-center gap-2">✓ Mild seasoning only</div>
+        </div>
+
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">Kitchen Gear Profile</h3>
+        <div class="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-300">
+          <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">🍳 Cast-Iron Skillet</div>
+          <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">🍟 Air Fryer</div>
+          <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">🔥 Outdoor Grill</div>
+          <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">🥘 Sheet Pans & Dutch Oven</div>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -149,7 +181,7 @@
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold mb-1">Family PIN</label>
-          <input type="text" id="cfgFamilyPin" placeholder="e.g. Prince2026" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700">
+          <input type="text" id="cfgFamilyPin" placeholder="e.g. 1989" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700">
         </div>
         <div>
           <label class="block font-bold mb-1">Firebase Configuration JSON</label>
@@ -167,15 +199,70 @@
   <script>
     var state = {
       items: [
-        { id: 1, name: 'Marble Cheddar (Costco)', store: 'Costco Barrhaven' },
-        { id: 2, name: 'Kraft Dinner 24pk', store: 'Costco Barrhaven' },
-        { id: 3, name: 'Mozzarella Sticks', store: 'Costco Barrhaven' },
-        { id: 4, name: 'Applesnax Apple Sauce', store: 'Costco Barrhaven' }
+        { id: 1, name: 'Kirkland Boneless Chicken Breasts', store: 'Costco' },
+        { id: 2, name: 'Kirkland Low Sodium Bacon 4pk', store: 'Costco' },
+        { id: 3, name: 'Motor City Detroit Pizza 2pk', store: 'Costco' },
+        { id: 4, name: 'Old El Paso Taco Kit', store: 'Costco' },
+        { id: 5, name: 'Garofalo Spaghettini 6pk', store: 'Costco' },
+        { id: 6, name: 'Long English Cucumbers 3pk', store: 'Costco' },
+        { id: 7, name: 'Marble Cheddar 2pk', store: 'Costco' },
+        { id: 8, name: 'Applesnax Apple Sauce Pouches', store: 'Costco' }
+      ],
+      pantry: [
+        { cat: 'Spices & Herbs', name: 'Kosher Salt', status: 'stocked' },
+        { cat: 'Spices & Herbs', name: 'Black Pepper', status: 'stocked' },
+        { cat: 'Spices & Herbs', name: 'Garlic Powder', status: 'stocked' },
+        { cat: 'Spices & Herbs', name: 'Onion Powder', status: 'stocked' },
+        { cat: 'Spices & Herbs', name: 'Smoked Paprika', status: 'stocked' },
+        { cat: 'Spices & Herbs', name: 'Italian Herb Seasoning', status: 'stocked' },
+        { cat: 'Spices & Herbs', name: 'Taco Seasoning', status: 'stocked' },
+        { cat: 'Oils & Sauces', name: 'Avocado Oil', status: 'stocked' },
+        { cat: 'Oils & Sauces', name: 'Kirkland Mayonnaise', status: 'stocked' },
+        { cat: 'Oils & Sauces', name: 'Pure Maple Syrup', status: 'stocked' },
+        { cat: 'Oils & Sauces', name: 'Soy Sauce', status: 'stocked' },
+        { cat: 'Baking & Grains', name: 'Jasmine Rice', status: 'stocked' },
+        { cat: 'Baking & Grains', name: 'Garofalo Spaghettini', status: 'stocked' },
+        { cat: 'Baking & Grains', name: 'Kraft Dinner', status: 'stocked' }
       ],
       plan: []
     };
 
     var dbRef = null;
+
+    var costcoScannedItems = [
+      { name: 'Kirkland B/S Chicken Breasts', store: 'Costco Barrhaven' },
+      { name: 'Kirkland Low-Sodium Bacon 4pk', store: 'Costco Barrhaven' },
+      { name: 'Kirkland Italian Sausage Lasagna', store: 'Costco Barrhaven' },
+      { name: 'Motor City Detroit Pizza 2pk', store: 'Costco Barrhaven' },
+      { name: 'Old El Paso Taco Kit', store: 'Costco Barrhaven' },
+      { name: 'Minh Pork & Veggie Egg Rolls', store: 'Costco Barrhaven' },
+      { name: 'Vegetable Samosas', store: 'Costco Barrhaven' },
+      { name: 'Petite Cuisine Mozzarella Sticks', store: 'Costco Barrhaven' },
+      { name: 'Garofalo Spaghettini 6pk', store: 'Costco Barrhaven' },
+      { name: 'Kraft Dinner 24pk', store: 'Costco Barrhaven' },
+      { name: 'St-Albert Poutine Curd', store: 'Costco Barrhaven' },
+      { name: 'Marble Cheddar 2pk', store: 'Costco Barrhaven' },
+      { name: 'Smoked Cheddar', store: 'Costco Barrhaven' },
+      { name: 'L’Extra Brie', store: 'Costco Barrhaven' },
+      { name: 'Havarti Variety Pack', store: 'Costco Barrhaven' },
+      { name: 'Beemster Aged Cheese', store: 'Costco Barrhaven' },
+      { name: 'Black Diamond Cheestrings 40pk', store: 'Costco Barrhaven' },
+      { name: 'Long English Cucumbers 3pk', store: 'Costco Barrhaven' },
+      { name: 'Mexican Street Corn Salad Kit', store: 'Costco Barrhaven' },
+      { name: 'Bananas', store: 'Costco Barrhaven' },
+      { name: 'Kirkland Blueberries', store: 'Costco Barrhaven' },
+      { name: 'Brioche Buns', store: 'Costco Barrhaven' },
+      { name: 'Ciabatta Buns', store: 'Costco Barrhaven' },
+      { name: 'White Bread 3pk', store: 'Costco Barrhaven' },
+      { name: 'Crystal Margarine', store: 'Costco Barrhaven' },
+      { name: 'Kirkland Mayonnaise 2pk', store: 'Costco Barrhaven' },
+      { name: 'Applesnax Apple Sauce Pouches', store: 'Costco Barrhaven' },
+      { name: 'Oikos 3% Greek Yogurt 24pk', store: 'Costco Barrhaven' },
+      { name: 'Yoplait Yop 12pk', store: 'Costco Barrhaven' },
+      { name: 'Kirkland PB Pretzels', store: 'Costco Barrhaven' },
+      { name: 'Homo Milk 4L', store: 'Costco Barrhaven' },
+      { name: '1% Milk 4L', store: 'Costco Barrhaven' }
+    ];
 
     function renderItems() {
       var list = document.getElementById('groceryItemList');
@@ -184,11 +271,65 @@
       state.items.forEach(function(item, index) {
         var li = document.createElement('li');
         li.className = 'py-2 flex items-center justify-between text-xs';
-        li.innerHTML = '<div><span class="font-bold text-slate-800 dark:text-slate-200">' + item.name + '</span><span class="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500">' + (item.store || 'Store') + '</span></div><button type="button" onclick="removeItem(' + index + ')" class="text-slate-400 hover:text-red-500 p-1 font-bold">✕</button>';
+        li.innerHTML = '<div><span class="font-bold text-slate-800 dark:text-slate-200">' + item.name + '</span><span class="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500">' + (item.store || 'Costco') + '</span></div><button type="button" onclick="removeItem(' + index + ')" class="text-slate-400 hover:text-red-500 p-1 font-bold">✕</button>';
         list.appendChild(li);
       });
       var count = document.getElementById('itemCountLabel');
       if (count) count.textContent = state.items.length + ' items ready';
+    }
+
+    function renderPantry() {
+      var container = document.getElementById('pantryCategoriesContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      var cats = {};
+      state.pantry.forEach(function(p, idx) {
+        if (!cats[p.cat]) cats[p.cat] = [];
+        cats[p.cat].push({ item: p, originalIndex: idx });
+      });
+
+      for (var catName in cats) {
+        var catBox = document.createElement('div');
+        catBox.className = 'border border-slate-200 dark:border-slate-800 rounded-lg p-3 space-y-2 bg-slate-50/50 dark:bg-slate-900/50';
+        var heading = '<h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">' + catName + '</h3>';
+        var listHtml = '<div class="space-y-1.5">';
+
+        cats[catName].forEach(function(entry) {
+          var isLow = entry.item.status === 'low';
+          var badge = isLow 
+            ? '<button type="button" onclick="togglePantryStock(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300">LOW (Added)</button>'
+            : '<button type="button" onclick="togglePantryStock(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300">In Stock</button>';
+
+          listHtml += '<div class="flex items-center justify-between text-xs py-1"><span class="' + (isLow ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-800 dark:text-slate-200') + '">' + entry.item.name + '</span>' + badge + '</div>';
+        });
+
+        listHtml += '</div>';
+        catBox.innerHTML = heading + listHtml;
+        container.appendChild(catBox);
+      }
+    }
+
+    function togglePantryStock(index) {
+      var p = state.pantry[index];
+      if (p.status === 'stocked') {
+        p.status = 'low';
+        quickAdd(p.name, 'Grocery / Costco');
+      } else {
+        p.status = 'stocked';
+      }
+      localStorage.setItem('prince_pantry', JSON.stringify(state.pantry));
+      renderPantry();
+      syncToCloud();
+    }
+
+    function loadCostcoScannedHaul() {
+      state.items = costcoScannedItems.map(function(item, idx) {
+        return { id: Date.now() + idx, name: item.name, store: item.store };
+      });
+      renderItems();
+      syncToCloud();
+      alert('Loaded 32 items from your Costco receipts into your active list!');
     }
 
     function addManualItem() {
@@ -202,171 +343,4 @@
     }
 
     function quickAdd(name, store) {
-      state.items.push({ id: Date.now(), name: name, store: store });
-      renderItems();
-      syncToCloud();
-    }
-
-    function removeItem(index) {
-      state.items.splice(index, 1);
-      renderItems();
-      syncToCloud();
-    }
-
-    function clearAllItems() {
-      if (!confirm('Clear the active grocery list?')) return;
-      state.items = [];
-      renderItems();
-      syncToCloud();
-    }
-
-    function switchTab(tabId) {
-      ['tab-groceries', 'tab-family', 'tab-plan'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
-      var target = document.getElementById(tabId);
-      if (target) target.classList.remove('hidden');
-
-      ['btn-groceries', 'btn-family', 'btn-plan'].forEach(function(id) {
-        var b = document.getElementById(id);
-        if (b) b.className = 'tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
-      });
-      var activeBtn = tabId === 'tab-groceries' ? 'btn-groceries' : (tabId === 'tab-family' ? 'btn-family' : 'btn-plan');
-      var activeEl = document.getElementById(activeBtn);
-      if (activeEl) activeEl.className = 'tab-btn py-2 text-xs font-bold rounded-lg bg-red-600 text-white shadow-sm';
-    }
-
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      var isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('prince_theme', isDark ? 'dark' : 'light');
-      updateThemeIcon();
-    }
-
-    function updateThemeIcon() {
-      var isDark = document.documentElement.classList.contains('dark');
-      var icon = document.getElementById('themeIcon');
-      if (icon) icon.textContent = isDark ? '☀️' : '🌙';
-    }
-
-    function openCloudModal() {
-      var modal = document.getElementById('cloudModal');
-      document.getElementById('cfgFamilyPin').value = localStorage.getItem('prince_family_pin') || '';
-      document.getElementById('cfgFirebaseConfig').value = localStorage.getItem('prince_firebase_cfg') || '';
-      modal.style.display = 'flex';
-    }
-
-    function closeCloudModal() {
-      var modal = document.getElementById('cloudModal');
-      modal.style.display = 'none';
-    }
-
-    function saveCloudConfig() {
-      var pin = document.getElementById('cfgFamilyPin').value.trim() || 'default_family';
-      var cfg = document.getElementById('cfgFirebaseConfig').value.trim();
-      localStorage.setItem('prince_family_pin', pin);
-      localStorage.setItem('prince_firebase_cfg', cfg);
-      closeCloudModal();
-      initFirebase();
-    }
-
-    function initFirebase() {
-      var configStr = localStorage.getItem('prince_firebase_cfg');
-      var pin = localStorage.getItem('prince_family_pin') || 'default_family';
-      if (!configStr) return;
-
-      try {
-        var config = JSON.parse(configStr);
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-          firebase.initializeApp(config);
-        }
-        var db = firebase.database();
-        dbRef = db.ref('families/' + pin);
-
-        dbRef.on('value', function(snapshot) {
-          var val = snapshot.val();
-          if (val && val.items) {
-            state.items = val.items;
-            localStorage.setItem('prince_items', JSON.stringify(state.items));
-            renderItems();
-          }
-          if (val && val.plan) {
-            state.plan = val.plan;
-            renderPlan();
-          }
-          updateCloudBadge(true);
-        });
-      } catch (err) {
-        console.error('Firebase error:', err);
-        updateCloudBadge(false);
-      }
-    }
-
-    function syncToCloud() {
-      localStorage.setItem('prince_items', JSON.stringify(state.items));
-      if (dbRef) {
-        dbRef.set({
-          items: state.items,
-          plan: state.plan,
-          updatedAt: Date.now()
-        });
-      }
-    }
-
-    function updateCloudBadge(connected) {
-      var pill = document.getElementById('cloudStatusBtn');
-      var txt = document.getElementById('cloudStatusText');
-      if (!pill || !txt) return;
-      if (connected) {
-        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 cursor-pointer';
-        txt.textContent = 'Synced';
-      } else {
-        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer';
-        txt.textContent = 'Local Mode';
-      }
-    }
-
-    function renderPlan() {
-      var container = document.getElementById('dinnerCardsContainer');
-      if (!container) return;
-      container.innerHTML = '';
-      state.plan.forEach(function(meal) {
-        var div = document.createElement('div');
-        div.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2';
-        div.innerHTML = '<div class="flex items-center justify-between"><span class="text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-400">' + meal.day + '</span><span class="text-[10px] font-medium text-slate-500">' + meal.gear + '</span></div><h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">' + meal.title + '</h3><div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-xs"><span class="font-bold text-amber-900 dark:text-amber-300">👦 6-Year-Old Tweak:</span><p class="text-amber-800 dark:text-amber-200 mt-0.5">' + meal.kidTweak + '</p></div><div class="flex items-center gap-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400"><span>❄️ Thaw:</span><span>' + meal.thaw + '</span></div>';
-        container.appendChild(div);
-      });
-    }
-
-    function generatePlan() {
-      state.plan = [
-        { day: 'Monday', title: 'Sheet-Pan Honey Garlic Chicken & Roasted Veggies', gear: 'Sheet Pan / Oven (400°F / 200°C)', kidTweak: 'Plain chicken strips with honey dip, roasted sweet potatoes, raw carrot sticks.', thaw: 'Move 1 lb Ground Beef to fridge.' },
-        { day: 'Tuesday', title: 'Loaded Cheesy Beef & Veggie Skillet Pasta', gear: 'Cast-Iron Skillet', kidTweak: 'Mild cheesy pasta with melted Costco marble cheddar mixed smooth.', thaw: 'Move chicken thighs or sausages to fridge.' },
-        { day: 'Wednesday', title: 'Air Fryer Mozzarella Stick Pizza Night', gear: 'Air Fryer (390°F / 200°C)', kidTweak: '3 mozzarella sticks, warm marinara dip, cucumber slices, Applesnax pouch.', thaw: 'None needed.' },
-        { day: 'Thursday', title: 'Elevated Kraft Dinner with Chicken Bites', gear: 'Stove & Air Fryer', kidTweak: 'Classic KD with sliced chicken nuggets/bites on side and snap peas.', thaw: 'Move Salmon fillets to fridge.' },
-        { day: 'Friday', title: 'Pan-Seared Salmon with Steamed Jasmine Rice', gear: 'Cast-Iron Skillet', kidTweak: 'Flaked salmon with honey-soy dip, buttered rice, cheddar slice.', thaw: 'Move ground beef to fridge.' },
-        { day: 'Saturday', title: 'Costco Cheddar Quesadillas & Mild Bean Dip', gear: 'Skillet / Grill', kidTweak: 'Cheese quesadilla triangles with mild dips in separate cups.', thaw: 'None.' },
-        { day: 'Sunday', title: 'Batch-Cook Beef Stew (or Smash Burgers)', gear: 'Dutch Oven or Outdoor Grill', kidTweak: 'Separated beef cubes, boiled baby potatoes, sweet potato fries.', thaw: 'Check upcoming week plan.' }
-      ];
-      renderPlan();
-    }
-
-    function init() {
-      var savedItems = localStorage.getItem('prince_items');
-      if (savedItems) {
-        try { state.items = JSON.parse(savedItems); } catch(e){}
-      }
-      var savedTheme = localStorage.getItem('prince_theme') || 'light';
-      if (savedTheme === 'dark') document.documentElement.classList.add('dark');
-      updateThemeIcon();
-
-      renderItems();
-      generatePlan();
-      initFirebase();
-    }
-
-    init();
-  </script>
-</body>
-</html>
+     
