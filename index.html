@@ -28,18 +28,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
-  <!-- Header -->
+  <!-- Header (Cleaned Subtitle) -->
   <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3">
     <div class="max-w-xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white font-black text-lg shadow-sm">P</div>
         <div>
           <h1 class="text-base font-extrabold tracking-tight">Prince Meal Plan</h1>
-          <p class="text-[10px] text-slate-500 font-medium">Costco Barrhaven & Smart Dinners</p>
         </div>
       </div>
       
@@ -138,26 +139,42 @@
       </div>
     </section>
 
-    <!-- TAB 3: DINNERS & NUTRIENT TRACKER -->
-    <section id="tab-plan" class="hidden space-y-4">
-      <!-- Weekly Micronutrient Audit Card -->
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2.5">
+    <!-- TAB 3: DINNERS (SLIDE-THROUGH DAY-BY-DAY VIEW) -->
+    <section id="tab-plan" class="hidden space-y-3">
+      
+      <!-- Day Switcher & Slide Navigation Bar -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Weekly Dinner Nutrient Audit</h2>
-          <span class="text-[10px] text-slate-400">Target: 4-7 days/week</span>
+          <button type="button" onclick="changeDay(-1)" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1 active:scale-95">
+            <span>◀</span> Prev Day
+          </button>
+          
+          <div class="text-center">
+            <span id="currentDayLabel" class="text-xs font-extrabold uppercase tracking-wide text-red-600 dark:text-red-400">Monday</span>
+            <span class="text-[10px] text-slate-400 block font-medium">Swipe card or tap days below</span>
+          </div>
+
+          <button type="button" onclick="changeDay(1)" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1 active:scale-95">
+            Next Day <span>▶</span>
+          </button>
         </div>
-        <p class="text-xs text-slate-500">Tracks key vitamins & minerals covered by dinners actually eaten.</p>
-        <div id="nutrientScorecard" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1"></div>
+
+        <!-- 7 Day Tap Pills -->
+        <div class="grid grid-cols-7 gap-1 pt-1" id="dayPillContainer"></div>
       </div>
 
-      <!-- Dinner Cards Header -->
-      <div class="flex items-center justify-between pt-1">
-        <div>
-          <h2 class="text-sm font-extrabold">Weekly Dinners & Smart Pivots</h2>
-          <p class="text-xs text-slate-500">Toggle Energy Level, pick Backups, or swap days</p>
-        </div>
-      </div>
-      <div id="dinnerCardsContainer" class="space-y-3"></div>
+      <!-- Single Active Day Dinner Card (Swipeable Container) -->
+      <div id="dinnerCardsContainer" class="transition-all duration-200"></div>
+
+      <!-- Collapsible Weekly Nutrient Audit -->
+      <details class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm">
+        <summary class="flex items-center justify-between text-xs font-bold cursor-pointer list-none select-none">
+          <span class="uppercase tracking-wider text-slate-500 dark:text-slate-400">📊 Weekly Dinner Nutrient Audit</span>
+          <span class="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+        </summary>
+        <p class="text-[11px] text-slate-500 pt-2 pb-1">Tracks key nutrients across all 7 dinners planned and logged.</p>
+        <div id="nutrientScorecard" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2"></div>
+      </details>
     </section>
 
     <!-- TAB 4: FAMILY & GEAR -->
@@ -258,6 +275,7 @@
       thawDone: false
     };
 
+    var currentDayIndex = 0; // 0 = Mon, 6 = Sun
     var dbRef = null;
 
     var costcoScannedItems = [
@@ -297,8 +315,8 @@
 
     var standardNutrients = ['Iron', 'Calcium', 'Fiber', 'Vit C', 'Vit D', 'Zinc', 'Omega-3'];
     var weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    var dayPillsShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-    // Keyword matching dictionary for automatic nutrient detection
     var NUTRIENT_KEYWORDS = {
       'Iron': ['steak', 'beef', 'burger', 'ground beef', 'roast', 'chicken', 'pork', 'turkey', 'bacon', 'lamb', 'spinach', 'beans', 'lentils', 'egg', 'eggs', 'tuna', 'shrimp', 'meat'],
       'Zinc': ['steak', 'beef', 'burger', 'pork', 'lamb', 'chicken', 'turkey', 'cheese', 'cheddar', 'seeds', 'nuts', 'beans', 'lentils', 'yogurt', 'eggs', 'egg'],
@@ -518,7 +536,6 @@
       }
     }
 
-    // Auto-detects nutrients and syncs when user leaves the input or presses Enter
     function saveCustomMealText(mealIdx) {
       var meal = state.plan[mealIdx];
       if (!meal) return;
@@ -586,7 +603,46 @@
       }
     }
 
+    // Switch between days (Slide navigation)
+    function changeDay(delta) {
+      currentDayIndex = currentDayIndex + delta;
+      if (currentDayIndex < 0) currentDayIndex = 6;
+      if (currentDayIndex > 6) currentDayIndex = 0;
+      renderPlan();
+    }
+
+    function setDay(idx) {
+      currentDayIndex = idx;
+      renderPlan();
+    }
+
+    function renderDayPills() {
+      var container = document.getElementById('dayPillContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      dayPillsShort.forEach(function(dShort, idx) {
+        var isCurrent = idx === currentDayIndex;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = function() { setDay(idx); };
+        btn.className = 'py-1.5 rounded-lg text-xs font-bold transition-all ' + 
+          (isCurrent 
+            ? 'bg-red-600 text-white shadow-sm scale-105' 
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700');
+        btn.textContent = dShort;
+        container.appendChild(btn);
+      });
+
+      var dayLabel = document.getElementById('currentDayLabel');
+      if (dayLabel) {
+        dayLabel.textContent = weekDays[currentDayIndex];
+      }
+    }
+
     function renderPlan() {
+      renderDayPills();
+
       var container = document.getElementById('dinnerCardsContainer');
       if (!container) return;
       container.innerHTML = '';
@@ -595,123 +651,164 @@
         generatePlan();
       }
 
-      state.plan.forEach(function(meal, idx) {
-        if (!meal) return;
-        var active = getActiveRecipe(meal) || {};
-        var div = document.createElement('div');
-        div.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3';
+      var idx = currentDayIndex;
+      var meal = state.plan[idx];
+      if (!meal) return;
 
-        var overrideBadge = meal.isOverridden 
-          ? '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-900">Custom Meal Logged ✎</button>'
-          : '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">Ate Planned Meal ✎</button>';
+      var active = getActiveRecipe(meal) || {};
+      var card = document.createElement('div');
+      card.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3.5';
 
-        var overrideInput = '';
-        if (meal.isOverridden) {
-          overrideInput = '<div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 space-y-1">' +
-            '<label class="block text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase">What did you actually make? (Auto-tags nutrients)</label>' +
-            '<input type="text" value="' + (meal.actualMade || '') + '" oninput="updateActualMealText(' + idx + ', this.value)" onblur="saveCustomMealText(' + idx + ')" onkeydown="if(event.key===\'Enter\'){this.blur();}" placeholder="e.g. Steak and salad, scrambled eggs, salmon..." class="w-full px-2.5 py-1.5 text-xs rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500">' +
-          '</div>';
-        }
+      // Clean, well-labelled override button
+      var overrideBadge = meal.isOverridden 
+        ? '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700">↩️ Revert to Planned Meal</button>'
+        : '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">✏️ Log Custom Meal</button>';
 
-        var recipeDetailsHtml = '';
-        if (active.steps && Array.isArray(active.steps) && active.steps.length) {
-          var stepsLi = active.steps.map(function(s, stepIdx) {
-            return '<li class="text-xs text-slate-600 dark:text-slate-300"><span class="font-bold text-slate-800 dark:text-slate-200">' + (stepIdx + 1) + '.</span> ' + s + '</li>';
-          }).join('');
+      var overrideInput = '';
+      if (meal.isOverridden) {
+        overrideInput = '<div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 space-y-1.5">' +
+          '<label class="block text-[11px] font-bold text-amber-900 dark:text-amber-300 uppercase">What did you make instead? (Auto-tags nutrients)</label>' +
+          '<input type="text" value="' + (meal.actualMade || '') + '" oninput="updateActualMealText(' + idx + ', this.value)" onblur="saveCustomMealText(' + idx + ')" onkeydown="if(event.key===\'Enter\'){this.blur();}" placeholder="e.g. Steak and salad, scrambled eggs, takeout..." class="w-full px-3 py-2 text-xs rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">' +
+        '</div>';
+      }
 
-          recipeDetailsHtml = 
-            '<details class="group border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 bg-slate-50/70 dark:bg-slate-800/40">' +
-              '<summary class="text-xs font-bold text-red-600 dark:text-red-400 cursor-pointer flex items-center justify-between list-none">' +
-                '<span>👨‍🍳 View Recipe Steps & Portions (Scaled for 3)</span>' +
-                '<span class="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>' +
-              '</summary>' +
-              '<div class="pt-3 space-y-2 border-t border-slate-200 dark:border-slate-700 mt-2">' +
-                '<div class="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px]">' +
-                  '<span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">⚖️ Exact Family Portions:</span>' +
-                  '<span class="text-slate-600 dark:text-slate-400">' + (active.portions || 'Scaled for 2 adults + 1 child') + '</span>' +
-                '</div>' +
-                '<div class="text-[11px] font-semibold text-slate-500">⏱️ ' + (active.timing || '15 min') + '</div>' +
-                '<ol class="space-y-1.5 pl-1">' + stepsLi + '</ol>' +
-              '</div>' +
-            '</details>';
-        }
-
-        var nutrientPills = '<div class="pt-1"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Dinner Nutrient Tags (Tap to toggle):</span><div class="flex flex-wrap gap-1">';
-        standardNutrients.forEach(function(n) {
-          var isTagActive = active.nutrients && active.nutrients.indexOf(n) > -1;
-          var btnStyle = isTagActive
-            ? 'bg-blue-600 text-white font-bold'
-            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium';
-          nutrientPills += '<button type="button" onclick="toggleMealNutrient(' + idx + ', \'' + n + '\')" class="px-2 py-0.5 text-[10px] rounded-md transition-colors ' + btnStyle + '">' + (isTagActive ? '✓ ' : '+ ') + n + '</button>';
-        });
-        nutrientPills += '</div></div>';
-
-        var swapOptions = weekDays.map(function(dName, dIdx) {
-          if (dIdx === idx) return '';
-          return '<option value="' + dIdx + '">Swap with ' + dName + '</option>';
+      // Recipe steps drawer
+      var recipeDetailsHtml = '';
+      if (active.steps && Array.isArray(active.steps) && active.steps.length) {
+        var stepsLi = active.steps.map(function(s, stepIdx) {
+          return '<li class="text-xs text-slate-600 dark:text-slate-300"><span class="font-bold text-slate-800 dark:text-slate-200">' + (stepIdx + 1) + '.</span> ' + s + '</li>';
         }).join('');
 
-        var backupOptions = '';
-        if (meal.backups && meal.backups.length) {
-          backupOptions = meal.backups.map(function(b, bIdx) {
-            var isSel = meal.selectedBackupIndex === bIdx ? 'selected' : '';
-            return '<option value="' + bIdx + '" ' + isSel + '>💡 ' + b.title + '</option>';
-          }).join('');
-        }
-
-        var freshnessBadge = '';
-        if (active.freshness === 'high') {
-          freshnessBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">🥗 Fresh</span>';
-        } else if (active.freshness === 'mid') {
-          freshnessBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">🥒 Mid</span>';
-        } else {
-          freshnessBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">❄️ Freezer</span>';
-        }
-
-        var energyBtn = meal.effort === 'low'
-          ? '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ 10-Min Quick</button>'
-          : '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200">⚡ Standard</button>';
-
-        div.innerHTML = 
-          '<div class="flex items-center justify-between">' +
-            '<div class="flex items-center gap-1.5">' +
-              '<span class="text-xs font-black uppercase tracking-wider text-red-600 dark:red-400">' + (meal.day || weekDays[idx]) + '</span>' +
-              freshnessBadge +
-              energyBtn +
+        recipeDetailsHtml = 
+          '<details class="group border border-slate-200 dark:border-slate-800 rounded-xl p-3 bg-slate-50/70 dark:bg-slate-800/40">' +
+            '<summary class="text-xs font-bold text-red-600 dark:text-red-400 cursor-pointer flex items-center justify-between list-none">' +
+              '<span>👨‍🍳 View Recipe Steps & Exact Portions (Scaled for 3)</span>' +
+              '<span class="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>' +
+            '</summary>' +
+            '<div class="pt-3 space-y-2 border-t border-slate-200 dark:border-slate-700 mt-2.5">' +
+              '<div class="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px]">' +
+                '<span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">⚖️ Exact Family Portions:</span>' +
+                '<span class="text-slate-600 dark:text-slate-400">' + (active.portions || 'Scaled for 2 adults + 1 child') + '</span>' +
+              '</div>' +
+              '<div class="text-[11px] font-semibold text-slate-500">⏱️ ' + (active.timing || '15 min') + '</div>' +
+              '<ol class="space-y-1.5 pl-1">' + stepsLi + '</ol>' +
             '</div>' +
-            '<div class="flex items-center gap-1">' +
-              '<select onchange="swapMeals(' + idx + ', parseInt(this.value))" class="text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded px-1 py-0.5 cursor-pointer">' +
-                '<option value="" selected disabled>⇄ Swap</option>' +
-                swapOptions +
-              '</select>' +
-              overrideBadge +
-            '</div>' +
-          '</div>' +
-          '<div>' +
-            '<div class="flex items-center justify-between">' +
-              '<div class="text-[10px] font-medium text-slate-400 mb-0.5">' + (active.gear || 'Stove / Skillet') + '</div>' +
-              (meal.backups && meal.backups.length ? 
-                '<select onchange="selectBackupMeal(' + idx + ', this.value)" class="text-[10px] font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-slate-600 dark:text-slate-300">' +
-                  '<option value="">💡 Pick Backup...</option>' + backupOptions +
-                '</select>' : '') +
-            '</div>' +
-            '<h3 class="text-sm font-bold ' + (meal.isOverridden ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-100') + '">' + (active.title || 'Dinner') + '</h3>' +
-          '</div>' +
-          overrideInput +
-          recipeDetailsHtml +
-          '<div class="p-2.5 rounded-lg bg-blue-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">' +
-            '<span class="font-bold text-blue-900 dark:text-blue-300">👦 6yo Plate: </span>' +
-            '<span class="text-slate-700 dark:text-slate-300">' + (active.kidTweak || 'Deconstructed plate with mild side dip.') + '</span>' +
-          '</div>' +
-          nutrientPills +
-          '<div class="flex items-center gap-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400 pt-1 border-t border-slate-100 dark:border-slate-800">' +
-            '<span>❄️ Thaw Alert:</span><span>' + (active.thaw || 'None needed.') + '</span>' +
-          '</div>';
+          '</details>';
+      }
 
-        container.appendChild(div);
+      // Clear interactive nutrient pills
+      var nutrientPills = '<div class="pt-1"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Dinner Nutrients (Auto-tagged or tap to toggle):</span><div class="flex flex-wrap gap-1.5">';
+      standardNutrients.forEach(function(n) {
+        var isTagActive = active.nutrients && active.nutrients.indexOf(n) > -1;
+        var btnStyle = isTagActive
+          ? 'bg-blue-600 text-white font-bold shadow-sm'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium';
+        nutrientPills += '<button type="button" onclick="toggleMealNutrient(' + idx + ', \'' + n + '\')" class="px-2.5 py-1 text-[11px] rounded-lg transition-colors ' + btnStyle + '">' + (isTagActive ? '✓ ' : '+ ') + n + '</button>';
       });
+      nutrientPills += '</div></div>';
 
+      // Clear swap dropdown
+      var swapOptions = weekDays.map(function(dName, dIdx) {
+        if (dIdx === idx) return '';
+        return '<option value="' + dIdx + '">Move to ' + dName + '</option>';
+      }).join('');
+
+      // Clear backup dropdown
+      var backupOptions = '';
+      if (meal.backups && meal.backups.length) {
+        backupOptions = meal.backups.map(function(b, bIdx) {
+          var isSel = meal.selectedBackupIndex === bIdx ? 'selected' : '';
+          return '<option value="' + bIdx + '" ' + isSel + '>💡 ' + b.title + '</option>';
+        }).join('');
+      }
+
+      // Freshness label
+      var freshnessBadge = '';
+      if (active.freshness === 'high') {
+        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">🥗 Eat First</span>';
+      } else if (active.freshness === 'mid') {
+        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">🥒 Mid-Week</span>';
+      } else {
+        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">❄️ Freezer/Pantry</span>';
+      }
+
+      // Cooking effort label
+      var energyBtn = meal.effort === 'low'
+        ? '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ Mode: 10-Min Quick</button>'
+        : '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700">⚡ Mode: Standard Cook</button>';
+
+      card.innerHTML = 
+        '<div class="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">' +
+          '<div class="flex items-center gap-1.5">' +
+            freshnessBadge +
+            energyBtn +
+          '</div>' +
+          overrideBadge +
+        '</div>' +
+
+        '<div class="space-y-1">' +
+          '<div class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">🍳 ' + (active.gear || 'Stove / Skillet') + '</div>' +
+          '<h3 class="text-base font-extrabold ' + (meal.isOverridden ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-100') + '">' + (active.title || 'Dinner') + '</h3>' +
+        '</div>' +
+
+        overrideInput +
+
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">' +
+          (meal.backups && meal.backups.length ? 
+            '<div>' +
+              '<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Quick Alternate Choice:</label>' +
+              '<select onchange="selectBackupMeal(' + idx + ', this.value)" class="w-full text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-700 dark:text-slate-200">' +
+                '<option value="">💡 Keep Default Recipe</option>' + backupOptions +
+              '</select>' +
+            '</div>' : '') +
+          '<div>' +
+            '<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Reorganize Schedule:</label>' +
+            '<select onchange="swapMeals(' + idx + ', parseInt(this.value))" class="w-full text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-700 dark:text-slate-200">' +
+              '<option value="" selected disabled>⇄ Move to another day...</option>' + swapOptions +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+
+        recipeDetailsHtml +
+
+        '<div class="p-3 rounded-xl bg-blue-50/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-xs space-y-0.5">' +
+          '<span class="font-bold text-blue-900 dark:text-blue-300 block">👦 6yo Plate Serving Tip:</span>' +
+          '<span class="text-slate-700 dark:text-slate-300">' + (active.kidTweak || 'Deconstructed plate with mild side dip.') + '</span>' +
+        '</div>' +
+
+        nutrientPills +
+
+        '<div class="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 pt-2 border-t border-slate-100 dark:border-slate-800">' +
+          '<span>❄️ Thaw Alert:</span><span>' + (active.thaw || 'None needed.') + '</span>' +
+        '</div>';
+
+      container.appendChild(card);
       renderNutrientScorecard();
+    }
+
+    // Touch swipe listener for sliding between days
+    var touchStartX = 0;
+    var touchEndX = 0;
+    function setupSwipeGestures() {
+      var container = document.getElementById('dinnerCardsContainer');
+      if (!container) return;
+      container.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      container.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+    }
+
+    function handleSwipe() {
+      if (touchEndX < touchStartX - 50) {
+        changeDay(1); // Swiped Left -> Go to Next Day
+      }
+      if (touchEndX > touchStartX + 50) {
+        changeDay(-1); // Swiped Right -> Go to Prev Day
+      }
     }
 
     function generatePlan() {
@@ -1169,6 +1266,7 @@
       renderPantry();
       renderPlan();
       updateThawBannerUI();
+      setupSwipeGestures();
       initFirebase();
     }
 
