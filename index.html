@@ -29,11 +29,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .badge { font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
-    @media print {
-      body { background: white !important; color: black !important; }
-      .no-print { display: none !important; }
-    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
@@ -51,13 +46,13 @@
       
       <div class="flex items-center gap-2">
         <!-- Cloud Sync Pill -->
-        <button onclick="openCloudModal()" id="cloudStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+        <button type="button" onclick="openCloudModal()" id="cloudStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
           <span id="cloudStatusText">Local Mode</span>
         </button>
 
         <!-- Dark Mode Toggle -->
-        <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+        <button type="button" onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">
           <span id="themeIcon">🌙</span>
         </button>
       </div>
@@ -67,158 +62,110 @@
   <!-- Navigation Tabs -->
   <nav class="sticky top-[57px] z-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2">
     <div class="max-w-xl mx-auto grid grid-cols-3 gap-2">
-      <button onclick="switchTab('tab-groceries')" id="btn-groceries" class="tab-btn py-2 text-xs font-bold rounded-lg bg-red-600 text-white shadow-sm">1. Groceries</button>
-      <button onclick="switchTab('tab-family')" id="btn-family" class="tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">2. Family & Gear</button>
-      <button onclick="switchTab('tab-plan')" id="btn-plan" class="tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">3. 7 Dinners</button>
+      <button type="button" onclick="switchTab('tab-groceries')" id="btn-groceries" class="tab-btn py-2 text-xs font-bold rounded-lg bg-red-600 text-white shadow-sm">1. Groceries</button>
+      <button type="button" onclick="switchTab('tab-family')" id="btn-family" class="tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">2. Family & Gear</button>
+      <button type="button" onclick="switchTab('tab-plan')" id="btn-plan" class="tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">3. 7 Dinners</button>
     </div>
   </nav>
 
   <!-- Main Content Container -->
   <main class="max-w-xl mx-auto p-4 pb-24 space-y-4">
 
-    <!-- TAB 1: GROCERIES & CUPBOARD -->
+    <!-- TAB 1: GROCERIES -->
     <section id="tab-groceries" class="space-y-4">
-      <!-- Input Card -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Add Grocery Items</h2>
         <div class="flex gap-2 mb-3">
-          <input type="text" id="quickItemInput" placeholder="e.g. KS Chicken Breasts, Cheddar, Applesnax..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
-          <button onclick="addManualItem()" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
+          <input type="text" id="quickItemInput" placeholder="e.g. KS Chicken Breasts, Cheddar..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <button type="button" onclick="addManualItem()" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
-        <!-- Barrhaven Staples Quick Pills -->
         <div class="space-y-1.5">
-          <p class="text-[11px] font-semibold text-slate-500">Quick-tap Costco favorites:</p>
+          <p class="text-[11px] font-semibold text-slate-500">Quick-tap Costco staples:</p>
           <div class="flex flex-wrap gap-1.5">
-            <button onclick="quickAdd('KS Chicken Breasts', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Chicken Breasts</button>
-            <button onclick="quickAdd('Extra Lean Ground Beef 3pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Ground Beef</button>
-            <button onclick="quickAdd('Atlantic Salmon', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Salmon</button>
-            <button onclick="quickAdd('Marble Cheddar 2pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Marble Cheddar</button>
-            <button onclick="quickAdd('Kraft Dinner 24pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Kraft Dinner</button>
-            <button onclick="quickAdd('Applesnax Apple Sauce', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Applesnax</button>
+            <button type="button" onclick="quickAdd('KS Chicken Breasts', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Chicken Breasts</button>
+            <button type="button" onclick="quickAdd('Extra Lean Ground Beef 3pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Ground Beef</button>
+            <button type="button" onclick="quickAdd('Atlantic Salmon', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Salmon</button>
+            <button type="button" onclick="quickAdd('Marble Cheddar 2pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Marble Cheddar</button>
+            <button type="button" onclick="quickAdd('Kraft Dinner 24pk', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Kraft Dinner</button>
+            <button type="button" onclick="quickAdd('Applesnax Apple Sauce', 'Costco')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Applesnax</button>
           </div>
         </div>
       </div>
 
-      <!-- Active Grocery List -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <div class="flex items-center justify-between mb-3">
           <div>
             <h2 class="text-sm font-bold">Active Haul & Cupboard</h2>
-            <p class="text-xs text-slate-500" id="itemCountLabel">0 items synced</p>
+            <p class="text-xs text-slate-500" id="itemCountLabel">Loading items...</p>
           </div>
-          <button onclick="clearAllItems()" class="text-xs text-red-600 dark:text-red-400 font-medium hover:underline">Clear List</button>
+          <button type="button" onclick="clearAllItems()" class="text-xs text-red-600 dark:text-red-400 font-medium hover:underline">Clear List</button>
         </div>
-        <ul id="groceryItemList" class="divide-y divide-slate-100 dark:divide-slate-800">
-          <!-- Populated by JavaScript -->
-        </ul>
+        <ul id="groceryItemList" class="divide-y divide-slate-100 dark:divide-slate-800"></ul>
       </div>
     </section>
 
-    <!-- TAB 2: FAMILY & APPLIANCES -->
+    <!-- TAB 2: FAMILY & GEAR -->
     <section id="tab-family" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
-        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Household Profile</h2>
+        <h2 class="text-sm font-bold">Household Profile</h2>
         <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs space-y-1">
-          <p class="font-bold text-blue-900 dark:text-blue-300">Default Family Profile:</p>
+          <p class="font-bold text-blue-900 dark:text-blue-300">Family Profile:</p>
           <p class="text-blue-800 dark:text-blue-400">2 Adults + 1 Child (6 years old)</p>
         </div>
 
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">6-Year-Old Picky Eater Rules</h3>
-        <div class="space-y-2 text-xs">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" checked class="rounded text-red-600 focus:ring-red-500">
-            <span>Deconstruct mixed meals (no layered casseroles)</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" checked class="rounded text-red-600 focus:ring-red-500">
-            <span>Serve sauces and gravies in side dip bowls</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" checked class="rounded text-red-600 focus:ring-red-500">
-            <span>Sub raw crunchy veggies (carrots/cucumbers) for cooked greens</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" checked class="rounded text-red-600 focus:ring-red-500">
-            <span>Mild seasoning only (black pepper and garlic on side)</span>
-          </label>
-        </div>
-
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">Available Cooking Gear</h3>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <label class="p-2 border rounded-lg flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-            <input type="checkbox" checked class="text-red-600"> Air Fryer
-          </label>
-          <label class="p-2 border rounded-lg flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-            <input type="checkbox" checked class="text-red-600"> Outdoor Grill
-          </label>
-          <label class="p-2 border rounded-lg flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-            <input type="checkbox" checked class="text-red-600"> Cast-Iron Skillet
-          </label>
-          <label class="p-2 border rounded-lg flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-            <input type="checkbox" checked class="text-red-600"> Sheet Pan / Oven
-          </label>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 pt-2">6-Year-Old Serving Rules</h3>
+        <div class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+          <div class="flex items-center gap-2">✓ Deconstruct mixed meals (no casseroles)</div>
+          <div class="flex items-center gap-2">✓ Serve sauces & gravies in side dip bowls</div>
+          <div class="flex items-center gap-2">✓ Crunchy raw veggies (carrots/cucumbers) on side</div>
+          <div class="flex items-center gap-2">✓ Mild seasoning only</div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 3: 7 DINNERS & RECIPES -->
+    <!-- TAB 3: 7 DINNERS -->
     <section id="tab-plan" class="hidden space-y-4">
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-sm font-extrabold">Weekly Family Dinners</h2>
           <p class="text-xs text-slate-500">Includes 6yo adaptations & thaw alerts</p>
         </div>
-        <button onclick="generatePlan()" class="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-red-700">
-          Refresh Plan
-        </button>
       </div>
-
-      <!-- Dinner Cards Container -->
-      <div id="dinnerCardsContainer" class="space-y-3">
-        <!-- Rendered by JS -->
-      </div>
+      <div id="dinnerCardsContainer" class="space-y-3"></div>
     </section>
 
   </main>
 
-  <!-- Cloud Setup Modal -->
-  <div id="cloudModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+  <!-- Cloud Sync Modal -->
+  <div id="cloudModal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl">
       <div class="flex items-center justify-between">
         <h3 class="font-extrabold text-sm">Google Cloud Sync Setup</h3>
-        <button onclick="closeCloudModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+        <button type="button" onclick="closeCloudModal()" class="text-slate-400 hover:text-slate-600 p-1">✕</button>
       </div>
-      <p class="text-xs text-slate-500">Connect to your free Google Firebase database to sync groceries and dinner plans between both Pixel phones.</p>
+      <p class="text-xs text-slate-500">Connect to your Firebase database to sync groceries and dinner plans between devices.</p>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold mb-1">Family Passcode / PIN</label>
+          <label class="block font-bold mb-1">Family PIN</label>
           <input type="text" id="cfgFamilyPin" placeholder="e.g. Prince2026" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700">
         </div>
         <div>
-          <label class="block font-bold mb-1">Device Name</label>
-          <select id="cfgDeviceName" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700">
-            <option value="Scott's Pixel 8a">Scott's Pixel 8a</option>
-            <option value="Danielle's Pixel 8">Wife's Pixel 8</option>
-          </select>
-        </div>
-        <div>
-          <label class="block font-bold mb-1">Firebase Configuration (JSON snippet)</label>
+          <label class="block font-bold mb-1">Firebase Configuration JSON</label>
           <textarea id="cfgFirebaseConfig" rows="4" placeholder='{"apiKey": "...", "databaseURL": "...", ...}' class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 font-mono text-[11px]"></textarea>
         </div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button onclick="saveCloudConfig()" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-red-700">Save & Connect</button>
-        <button onclick="closeCloudModal()" class="px-3 py-2 border rounded-lg text-xs font-semibold">Cancel</button>
+        <button type="button" onclick="saveCloudConfig()" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-red-700">Save & Connect</button>
+        <button type="button" onclick="closeCloudModal()" class="px-3 py-2 border rounded-lg text-xs font-semibold">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Application Logic -->
   <script>
-    let state = {
+    var state = {
       items: [
         { id: 1, name: 'Marble Cheddar (Costco)', store: 'Costco Barrhaven' },
         { id: 2, name: 'Kraft Dinner 24pk', store: 'Costco Barrhaven' },
@@ -228,37 +175,117 @@
       plan: []
     };
 
-    let dbRef = null;
+    var dbRef = null;
 
-    function init() {
-      const savedItems = localStorage.getItem('prince_items');
-      if (savedItems) state.items = JSON.parse(savedItems);
-      
-      const savedTheme = localStorage.getItem('prince_theme') || 'light';
-      if (savedTheme === 'dark') document.documentElement.classList.add('dark');
-      updateThemeIcon();
+    function renderItems() {
+      var list = document.getElementById('groceryItemList');
+      if (!list) return;
+      list.innerHTML = '';
+      state.items.forEach(function(item, index) {
+        var li = document.createElement('li');
+        li.className = 'py-2 flex items-center justify-between text-xs';
+        li.innerHTML = '<div><span class="font-bold text-slate-800 dark:text-slate-200">' + item.name + '</span><span class="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500">' + (item.store || 'Store') + '</span></div><button type="button" onclick="removeItem(' + index + ')" class="text-slate-400 hover:text-red-500 p-1 font-bold">✕</button>';
+        list.appendChild(li);
+      });
+      var count = document.getElementById('itemCountLabel');
+      if (count) count.textContent = state.items.length + ' items ready';
+    }
 
+    function addManualItem() {
+      var input = document.getElementById('quickItemInput');
+      var val = input.value.trim();
+      if (!val) return;
+      state.items.push({ id: Date.now(), name: val, store: 'Costco Barrhaven' });
+      input.value = '';
       renderItems();
-      generatePlan();
+      syncToCloud();
+    }
+
+    function quickAdd(name, store) {
+      state.items.push({ id: Date.now(), name: name, store: store });
+      renderItems();
+      syncToCloud();
+    }
+
+    function removeItem(index) {
+      state.items.splice(index, 1);
+      renderItems();
+      syncToCloud();
+    }
+
+    function clearAllItems() {
+      if (!confirm('Clear the active grocery list?')) return;
+      state.items = [];
+      renderItems();
+      syncToCloud();
+    }
+
+    function switchTab(tabId) {
+      ['tab-groceries', 'tab-family', 'tab-plan'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      var target = document.getElementById(tabId);
+      if (target) target.classList.remove('hidden');
+
+      ['btn-groceries', 'btn-family', 'btn-plan'].forEach(function(id) {
+        var b = document.getElementById(id);
+        if (b) b.className = 'tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+      });
+      var activeBtn = tabId === 'tab-groceries' ? 'btn-groceries' : (tabId === 'tab-family' ? 'btn-family' : 'btn-plan');
+      var activeEl = document.getElementById(activeBtn);
+      if (activeEl) activeEl.className = 'tab-btn py-2 text-xs font-bold rounded-lg bg-red-600 text-white shadow-sm';
+    }
+
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      var isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('prince_theme', isDark ? 'dark' : 'light');
+      updateThemeIcon();
+    }
+
+    function updateThemeIcon() {
+      var isDark = document.documentElement.classList.contains('dark');
+      var icon = document.getElementById('themeIcon');
+      if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    function openCloudModal() {
+      var modal = document.getElementById('cloudModal');
+      document.getElementById('cfgFamilyPin').value = localStorage.getItem('prince_family_pin') || '';
+      document.getElementById('cfgFirebaseConfig').value = localStorage.getItem('prince_firebase_cfg') || '';
+      modal.style.display = 'flex';
+    }
+
+    function closeCloudModal() {
+      var modal = document.getElementById('cloudModal');
+      modal.style.display = 'none';
+    }
+
+    function saveCloudConfig() {
+      var pin = document.getElementById('cfgFamilyPin').value.trim() || 'default_family';
+      var cfg = document.getElementById('cfgFirebaseConfig').value.trim();
+      localStorage.setItem('prince_family_pin', pin);
+      localStorage.setItem('prince_firebase_cfg', cfg);
+      closeCloudModal();
       initFirebase();
     }
 
     function initFirebase() {
-      const configStr = localStorage.getItem('prince_firebase_cfg');
-      const pin = localStorage.getItem('prince_family_pin') || 'default_family';
+      var configStr = localStorage.getItem('prince_firebase_cfg');
+      var pin = localStorage.getItem('prince_family_pin') || 'default_family';
       if (!configStr) return;
 
       try {
-        let config = JSON.parse(configStr);
-        if (!firebase.apps.length) {
+        var config = JSON.parse(configStr);
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
           firebase.initializeApp(config);
         }
-        const db = firebase.database();
+        var db = firebase.database();
         dbRef = db.ref('families/' + pin);
 
-        // Listen for live updates from the other phone
-        dbRef.on('value', (snapshot) => {
-          const val = snapshot.val();
+        dbRef.on('value', function(snapshot) {
+          var val = snapshot.val();
           if (val && val.items) {
             state.items = val.items;
             localStorage.setItem('prince_items', JSON.stringify(state.items));
@@ -288,122 +315,58 @@
     }
 
     function updateCloudBadge(connected) {
-      const pill = document.getElementById('cloudStatusBtn');
-      const txt = document.getElementById('cloudStatusText');
+      var pill = document.getElementById('cloudStatusBtn');
+      var txt = document.getElementById('cloudStatusText');
+      if (!pill || !txt) return;
       if (connected) {
-        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700';
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 cursor-pointer';
         txt.textContent = 'Synced';
       } else {
-        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700';
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer';
         txt.textContent = 'Local Mode';
       }
     }
 
-    function renderItems() {
-      const list = document.getElementById('groceryItemList');
-      list.innerHTML = '';
-      state.items.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.className = 'py-2 flex items-center justify-between text-xs';
-        li.innerHTML = `
-          <div>
-            <span class="font-bold text-slate-800 dark:text-slate-200">${item.name}</span>
-            <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500">${item.store || 'Store'}</span>
-          </div>
-          <button onclick="removeItem(${index})" class="text-slate-400 hover:text-red-500 p-1">✕</button>
-        `;
-        list.appendChild(li);
+    function renderPlan() {
+      var container = document.getElementById('dinnerCardsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      state.plan.forEach(function(meal) {
+        var div = document.createElement('div');
+        div.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2';
+        div.innerHTML = '<div class="flex items-center justify-between"><span class="text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-400">' + meal.day + '</span><span class="text-[10px] font-medium text-slate-500">' + meal.gear + '</span></div><h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">' + meal.title + '</h3><div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-xs"><span class="font-bold text-amber-900 dark:text-amber-300">👦 6-Year-Old Tweak:</span><p class="text-amber-800 dark:text-amber-200 mt-0.5">' + meal.kidTweak + '</p></div><div class="flex items-center gap-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400"><span>❄️ Thaw:</span><span>' + meal.thaw + '</span></div>';
+        container.appendChild(div);
       });
-      document.getElementById('itemCountLabel').textContent = `${state.items.length} items synced`;
-    }
-
-    function addManualItem() {
-      const input = document.getElementById('quickItemInput');
-      const val = input.value.trim();
-      if (!val) return;
-      state.items.push({ id: Date.now(), name: val, store: 'Costco Barrhaven' });
-      input.value = '';
-      renderItems();
-      syncToCloud();
-    }
-
-    function quickAdd(name, store) {
-      state.items.push({ id: Date.now(), name: name, store: store });
-      renderItems();
-      syncToCloud();
-    }
-
-    function removeItem(index) {
-      state.items.splice(index, 1);
-      renderItems();
-      syncToCloud();
-    }
-
-    function clearAllItems() {
-      if (!confirm('Clear the active grocery list?')) return;
-      state.items = [];
-      renderItems();
-      syncToCloud();
-    }
-
-    function switchTab(tabId) {
-      ['tab-groceries', 'tab-family', 'tab-plan'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-      });
-      document.getElementById(tabId).classList.remove('hidden');
-
-      ['btn-groceries', 'btn-family', 'btn-plan'].forEach(id => {
-        const b = document.getElementById(id);
-        b.className = 'tab-btn py-2 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
-      });
-      const activeBtn = tabId === 'tab-groceries' ? 'btn-groceries' : (tabId === 'tab-family' ? 'btn-family' : 'btn-plan');
-      document.getElementById(activeBtn).className = 'tab-btn py-2 text-xs font-bold rounded-lg bg-red-600 text-white shadow-sm';
-    }
-
-    function toggleDarkMode() {
-      document.documentElement.classList.toggle('dark');
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('prince_theme', isDark ? 'dark' : 'light');
-      updateThemeIcon();
-    }
-
-    function updateThemeIcon() {
-      const isDark = document.documentElement.classList.contains('dark');
-      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
-    }
-
-    function openCloudModal() {
-      document.getElementById('cfgFamilyPin').value = localStorage.getItem('prince_family_pin') || '';
-      document.getElementById('cfgFirebaseConfig').value = localStorage.getItem('prince_firebase_cfg') || '';
-      document.getElementById('cloudModal').classList.remove('hidden');
-    }
-
-    function closeCloudModal() {
-      document.getElementById('cloudModal').classList.add('hidden');
-    }
-
-    function saveCloudConfig() {
-      const pin = document.getElementById('cfgFamilyPin').value.trim() || 'default_family';
-      const cfg = document.getElementById('cfgFirebaseConfig').value.trim();
-      localStorage.setItem('prince_family_pin', pin);
-      localStorage.setItem('prince_firebase_cfg', cfg);
-      closeCloudModal();
-      initFirebase();
     }
 
     function generatePlan() {
       state.plan = [
-        {
-          day: 'Monday',
-          title: 'Sheet-Pan Honey Garlic Chicken & Roasted Veggies',
-          gear: 'Sheet Pan / Oven (400°F / 200°C)',
-          kidTweak: 'Deconstructed plain chicken slices with honey garlic dip in a side bowl, roasted sweet potatoes, and raw carrot sticks.',
-          thaw: 'Move 1 lb Ground Beef to fridge tonight.'
-        },
-        {
-          day: 'Tuesday',
-          title: 'Loaded Cheesy Beef & Veggie Skillet Pasta',
-          gear: 'Cast-Iron Skillet',
-          kidTweak: 'Mild cheesy pasta with melted Costco marble cheddar mixed smooth; vegetables finely diced.',
-          thaw: 'Move chicken thighs or sausages to fridge tonight.'
-       
+        { day: 'Monday', title: 'Sheet-Pan Honey Garlic Chicken & Roasted Veggies', gear: 'Sheet Pan / Oven (400°F / 200°C)', kidTweak: 'Plain chicken strips with honey dip, roasted sweet potatoes, raw carrot sticks.', thaw: 'Move 1 lb Ground Beef to fridge.' },
+        { day: 'Tuesday', title: 'Loaded Cheesy Beef & Veggie Skillet Pasta', gear: 'Cast-Iron Skillet', kidTweak: 'Mild cheesy pasta with melted Costco marble cheddar mixed smooth.', thaw: 'Move chicken thighs or sausages to fridge.' },
+        { day: 'Wednesday', title: 'Air Fryer Mozzarella Stick Pizza Night', gear: 'Air Fryer (390°F / 200°C)', kidTweak: '3 mozzarella sticks, warm marinara dip, cucumber slices, Applesnax pouch.', thaw: 'None needed.' },
+        { day: 'Thursday', title: 'Elevated Kraft Dinner with Chicken Bites', gear: 'Stove & Air Fryer', kidTweak: 'Classic KD with sliced chicken nuggets/bites on side and snap peas.', thaw: 'Move Salmon fillets to fridge.' },
+        { day: 'Friday', title: 'Pan-Seared Salmon with Steamed Jasmine Rice', gear: 'Cast-Iron Skillet', kidTweak: 'Flaked salmon with honey-soy dip, buttered rice, cheddar slice.', thaw: 'Move ground beef to fridge.' },
+        { day: 'Saturday', title: 'Costco Cheddar Quesadillas & Mild Bean Dip', gear: 'Skillet / Grill', kidTweak: 'Cheese quesadilla triangles with mild dips in separate cups.', thaw: 'None.' },
+        { day: 'Sunday', title: 'Batch-Cook Beef Stew (or Smash Burgers)', gear: 'Dutch Oven or Outdoor Grill', kidTweak: 'Separated beef cubes, boiled baby potatoes, sweet potato fries.', thaw: 'Check upcoming week plan.' }
+      ];
+      renderPlan();
+    }
+
+    function init() {
+      var savedItems = localStorage.getItem('prince_items');
+      if (savedItems) {
+        try { state.items = JSON.parse(savedItems); } catch(e){}
+      }
+      var savedTheme = localStorage.getItem('prince_theme') || 'light';
+      if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+      updateThemeIcon();
+
+      renderItems();
+      generatePlan();
+      initFirebase();
+    }
+
+    init();
+  </script>
+</body>
+</html>
