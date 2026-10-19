@@ -25,6 +25,8 @@
   </script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- In-Browser OCR Camera Scanner -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -33,6 +35,9 @@
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+  <!-- Hidden Photo / Camera Input -->
+  <input type="file" id="cameraFileInput" accept="image/*" class="hidden" onchange="handleImageScanned(event)">
 
   <!-- Header -->
   <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 py-3">
@@ -89,13 +94,17 @@
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Add Grocery Items</h2>
         <div class="flex gap-2 mb-3">
-          <input type="text" id="quickItemInput" placeholder="Add grocery or Costco staple..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <input type="text" id="quickItemInput" placeholder="Add grocery or staple..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
           <button type="button" onclick="addManualItem()" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
-        <div class="mb-3">
-          <button type="button" onclick="loadCostcoScannedHaul()" class="w-full py-2 px-3 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
-            <span>📥</span> Load Scanned Costco Receipts (32 Items)
+        <!-- Camera Scanner & Costco Scanned Haul Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+          <button type="button" onclick="triggerCameraScan('haul')" class="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>📷</span> Snap / Upload Receipt
+          </button>
+          <button type="button" onclick="loadCostcoScannedHaul()" class="w-full py-2.5 px-3 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>📥</span> Scanned Haul (32 Items)
           </button>
         </div>
 
@@ -126,32 +135,45 @@
     <!-- TAB 2: PANTRY & STAPLES -->
     <section id="tab-pantry" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2.5">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add Household Staple</h2>
-        <p class="text-[11px] text-slate-500">Add staples you always keep in stock. Tap <strong>"Low"</strong> whenever you run out to send it to Tab 1 (Haul).</p>
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add Household Staple</h2>
+          <button type="button" onclick="triggerCameraScan('pantry')" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline">
+            <span>📷</span> Snap Shelf Photo
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500">Items you always keep in stock. Tap <strong>"Low"</strong> whenever you run out to send it to Tab 1 (Haul).</p>
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
           <input type="text" id="newPantryItemName" placeholder="e.g. Avocado Oil, Hemp Hearts..." class="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
           <select id="newPantryItemCat" class="px-2.5 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-            <option value="Spices & Herbs">Spices & Herbs</option>
-            <option value="Oils & Sauces">Oils & Sauces</option>
+            <option value="Spices & Seasoning Blends">Spices & Seasoning Blends</option>
+            <option value="Herbs & Whole Spices">Herbs & Whole Spices</option>
+            <option value="Oils, Sprays & Vinegars">Oils, Sprays & Vinegars</option>
+            <option value="Freezer Staples">Freezer Staples</option>
             <option value="Baking & Grains">Baking & Grains</option>
             <option value="Nuts, Seeds & Snacks">Nuts, Seeds & Snacks</option>
-            <option value="Fridge & Dairy">Fridge & Dairy</option>
-            <option value="Freezer Staples">Freezer Staples</option>
             <option value="General Pantry">General Pantry</option>
           </select>
         </div>
-        <button type="button" onclick="addNewPantryItem()" class="w-full py-2 bg-red-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-98">
-          + Add to Permanent Pantry
-        </button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button type="button" onclick="addNewPantryItem()" class="py-2 bg-red-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-98">
+            + Add to Permanent Pantry
+          </button>
+          <button type="button" onclick="triggerCameraScan('pantry')" class="py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-emerald-700 active:scale-98 flex items-center justify-center gap-1.5">
+            <span>📷</span> Scan Pantry Shelf / Jar Labels
+          </button>
+        </div>
       </div>
 
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <div class="flex items-center justify-between mb-2">
           <div>
-            <h2 class="text-sm font-bold">Pantry Inventory</h2>
-            <p class="text-xs text-slate-500">Persistent household stock</p>
+            <h2 class="text-sm font-bold">Pantry & Freezer Inventory</h2>
+            <p class="text-xs text-slate-500" id="pantryCountLabel">Persistent household stock</p>
           </div>
+          <button type="button" onclick="resetToVerifiedStock()" class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+            ↺ Reload Stocked Inventory
+          </button>
         </div>
         <div id="pantryCategoriesContainer" class="space-y-4 pt-1"></div>
       </div>
@@ -177,7 +199,6 @@
           </button>
         </div>
 
-        <!-- 7 Day Tap Pills -->
         <div class="grid grid-cols-7 gap-1 pt-1" id="dayPillContainer"></div>
       </div>
 
@@ -193,15 +214,12 @@
         <p class="text-[11px] text-slate-500 pt-2 pb-1">Target is 4-7 days/week. Tap any badge below for 30-second zero-prep sides.</p>
         <div id="nutrientScorecard" class="grid grid-cols-3 sm:grid-cols-5 gap-1.5 pt-1.5"></div>
         
-        <!-- Dynamic Booster Panel -->
         <div id="nutrientBoosterContainer" class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 hidden"></div>
       </details>
     </section>
 
     <!-- TAB 4: FAMILY & PORTION HEADCOUNT -->
     <section id="tab-family" class="hidden space-y-4">
-      
-      <!-- Headcount Adjuster Card -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div>
           <h2 class="text-sm font-bold">Household & Dinner Guest Portions</h2>
@@ -209,7 +227,6 @@
         </div>
 
         <div class="space-y-2.5 pt-1">
-          <!-- Adults Stepper -->
           <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
             <div>
               <span class="text-xs font-bold block">Adults</span>
@@ -222,7 +239,6 @@
             </div>
           </div>
 
-          <!-- Kids Stepper -->
           <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
             <div>
               <span class="text-xs font-bold block">Kids</span>
@@ -235,7 +251,6 @@
             </div>
           </div>
 
-          <!-- Guests Stepper -->
           <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800">
             <div>
               <span class="text-xs font-bold block">Dinner Guests</span>
@@ -255,7 +270,6 @@
         </div>
       </div>
 
-      <!-- Freshness Hierarchy Guide -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Freshness Hierarchy System</h3>
         <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 pt-1">
@@ -264,10 +278,50 @@
           <p>🧀 <strong>Days 5-7 (End of Week):</strong> Cured bacon, hard cheeses, pasta, freezer meals.</p>
         </div>
       </div>
-
     </section>
 
   </main>
+
+  <!-- OCR Scanning Progress Modal -->
+  <div id="ocrProgressModal" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 max-w-xs w-full text-center space-y-4 shadow-2xl">
+      <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center text-2xl mx-auto animate-bounce">
+        📷
+      </div>
+      <div>
+        <h3 class="text-sm font-extrabold text-slate-900 dark:text-white" id="ocrProgressTitle">Reading Image...</h3>
+        <p class="text-xs text-slate-500 mt-1" id="ocrProgressStatus">Initializing camera OCR engine...</p>
+      </div>
+      <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+        <div id="ocrProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-300" style="width: 15%"></div>
+      </div>
+      <p class="text-[10px] text-slate-400">Extracting text directly on your device...</p>
+    </div>
+  </div>
+
+  <!-- OCR Verification & Edit Modal -->
+  <div id="ocrReviewModal" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-3.5 shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h3 class="text-sm font-extrabold" id="ocrReviewTitle">Review Detected Items</h3>
+          <p class="text-[11px] text-slate-500">Uncheck or edit any items before adding.</p>
+        </div>
+        <button type="button" onclick="closeOcrReviewModal()" class="text-slate-400 hover:text-slate-600 p-1 font-bold">✕</button>
+      </div>
+
+      <div class="overflow-y-auto space-y-2 flex-1 pr-1" id="ocrDetectedItemsList"></div>
+
+      <div class="pt-2 flex gap-2 border-t border-slate-100 dark:border-slate-800">
+        <button type="button" onclick="confirmScannedItems()" class="flex-1 py-2 bg-emerald-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-emerald-700 active:scale-98" id="ocrConfirmBtn">
+          ✓ Add Selected Items
+        </button>
+        <button type="button" onclick="closeOcrReviewModal()" class="px-3 py-2 border rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Cloud Sync Modal -->
   <div id="cloudModal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm items-center justify-center p-4">
@@ -308,12 +362,68 @@
     };
     var DEFAULT_FAMILY_PIN = "1989";
 
+    var VERIFIED_PANTRY_STOCK = [
+      { cat: 'Spices & Seasoning Blends', name: 'Montreal Steak Spice (Club House La Grille)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Montreal Chicken Seasoning (Club House La Grille)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Maple Bacon Seasoning (Club House La Grille)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Seasoned Salt (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Cajun Seasoning (Altius)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Braai & Grill Seasoning (Ina Paarman\'s)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Ted\'s World Famous Dust Seasoning', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Garlic & Pepper Seasoning (Spice Supreme)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Taco Seasoning (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Tandoori Masala (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Curry Powder (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Dry Mustard (Keen\'s)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Chilli Powder (Buddha\'s Natural)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Cayenne Pepper (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Ground Turmeric (PC)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Roasted Ground Coriander (McCormick)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Ground Cumin', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Ground Allspice (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Smoked Paprika (Valle Coronado / Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Garlic Powder', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Onion Powder (Club House)', status: 'stocked' },
+      { cat: 'Spices & Seasoning Blends', name: 'Ground Cinnamon (Club House)', status: 'stocked' },
+
+      { cat: 'Herbs & Whole Spices', name: 'Black Peppercorns (Grinder)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Kosher Salt', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Thyme Leaves (Club House)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Rosemary Leaves (Club House)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Ground Savory (Club House)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Dill Weed (Club House)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Parsley Flakes (Spice Supreme)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Crushed Red Chilies', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Celery Seed (PC)', status: 'stocked' },
+      { cat: 'Herbs & Whole Spices', name: 'Italian Herb Seasoning', status: 'stocked' },
+
+      { cat: 'Oils, Sprays & Vinegars', name: 'Kirkland Avocado Oil (Jug)', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Extra Virgin Olive Oil (Tin)', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Kirkland Canola Cooking Spray', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Balsamic & Wine Vinegar', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Salad Dressing / Vinaigrette', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Soy Sauce', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Kirkland Mayonnaise', status: 'stocked' },
+      { cat: 'Oils, Sprays & Vinegars', name: 'Pure Maple Syrup', status: 'stocked' },
+
+      { cat: 'Freezer Staples', name: 'Mr. Donair Donair Dunkers', status: 'stocked' },
+      { cat: 'Freezer Staples', name: 'Cuisine Adventures Spinach & Artichoke Dip', status: 'stocked' },
+      { cat: 'Freezer Staples', name: 'Cuisine Adventures Mini Quiche (3 Flavours)', status: 'stocked' },
+      { cat: 'Freezer Staples', name: 'Chicken Samosas (Samosa au poulet)', status: 'stocked' },
+      { cat: 'Freezer Staples', name: 'Fresh Sausage Tray', status: 'stocked' },
+      { cat: 'Freezer Staples', name: 'Roman Meat Lasagna', status: 'stocked' },
+      { cat: 'Freezer Staples', name: 'Gold Label Thick Cut Bacon', status: 'stocked' },
+
+      { cat: 'Baking & Grains', name: 'Sun-Maid Cinnamon Swirl Raisin Bread', status: 'stocked' },
+      { cat: 'Baking & Grains', name: 'Italian Style Breadcrumbs', status: 'stocked' },
+      { cat: 'Baking & Grains', name: 'Jasmine Rice', status: 'stocked' },
+      { cat: 'Baking & Grains', name: 'Garofalo Spaghettini', status: 'stocked' },
+      { cat: 'Baking & Grains', name: 'Kraft Dinner', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Kirkland PB Pretzels', status: 'stocked' }
+    ];
+
     var state = {
-      family: {
-        adults: 2,
-        kids: 1,
-        guests: 0
-      },
+      family: { adults: 2, kids: 1, guests: 0 },
       items: [
         { id: 1, name: 'Kirkland Boneless Chicken Breasts', store: 'Costco' },
         { id: 2, name: 'Kirkland Low Sodium Bacon 4pk', store: 'Costco' },
@@ -324,29 +434,15 @@
         { id: 7, name: 'Marble Cheddar 2pk', store: 'Costco' },
         { id: 8, name: 'Applesnax Apple Sauce Pouches', store: 'Costco' }
       ],
-      pantry: [
-        { cat: 'Spices & Herbs', name: 'Kosher Salt', status: 'stocked' },
-        { cat: 'Spices & Herbs', name: 'Black Pepper', status: 'stocked' },
-        { cat: 'Spices & Herbs', name: 'Garlic Powder', status: 'stocked' },
-        { cat: 'Spices & Herbs', name: 'Onion Powder', status: 'stocked' },
-        { cat: 'Spices & Herbs', name: 'Smoked Paprika', status: 'stocked' },
-        { cat: 'Spices & Herbs', name: 'Italian Herb Seasoning', status: 'stocked' },
-        { cat: 'Spices & Herbs', name: 'Taco Seasoning', status: 'stocked' },
-        { cat: 'Oils & Sauces', name: 'Avocado Oil', status: 'stocked' },
-        { cat: 'Oils & Sauces', name: 'Kirkland Mayonnaise', status: 'stocked' },
-        { cat: 'Oils & Sauces', name: 'Pure Maple Syrup', status: 'stocked' },
-        { cat: 'Oils & Sauces', name: 'Soy Sauce', status: 'stocked' },
-        { cat: 'Baking & Grains', name: 'Jasmine Rice', status: 'stocked' },
-        { cat: 'Baking & Grains', name: 'Garofalo Spaghettini', status: 'stocked' },
-        { cat: 'Baking & Grains', name: 'Kraft Dinner', status: 'stocked' },
-        { cat: 'Nuts, Seeds & Snacks', name: 'Kirkland PB Pretzels', status: 'stocked' }
-      ],
+      pantry: VERIFIED_PANTRY_STOCK.slice(),
       plan: [],
       thawDone: false
     };
 
     var currentDayIndex = 0;
     var selectedNutrientDetail = null;
+    var currentScanTarget = 'haul'; // 'haul' or 'pantry'
+    var pendingScannedItems = [];
     var dbRef = null;
 
     var costcoScannedItems = [
@@ -401,15 +497,15 @@
     };
 
     var NUTRIENT_KEYWORDS = {
-      'Iron': ['steak', 'beef', 'burger', 'ground beef', 'roast', 'chicken', 'pork', 'turkey', 'bacon', 'lamb', 'spinach', 'beans', 'lentils', 'egg', 'eggs', 'tuna', 'shrimp', 'meat'],
-      'Zinc': ['steak', 'beef', 'burger', 'pork', 'lamb', 'chicken', 'turkey', 'cheese', 'cheddar', 'seeds', 'nuts', 'beans', 'lentils', 'yogurt', 'eggs', 'egg'],
-      'Calcium': ['milk', 'cheese', 'cheddar', 'mozzarella', 'mozza', 'parmesan', 'yogurt', 'pizza', 'lasagna', 'quesadilla', 'feta', 'curd', 'poutine', 'dairy', 'cheestring', 'cheestrings', 'brie', 'havarti'],
-      'Fiber': ['salad', 'broccoli', 'beans', 'lentils', 'rice', 'veggies', 'vegetables', 'apple', 'apples', 'berries', 'blueberries', 'banana', 'bananas', 'corn', 'cucumber', 'cucumbers', 'peppers', 'pasta', 'bread', 'spaghetti', 'potato', 'potatoes', 'sweet potato', 'samosa', 'samosas', 'egg roll', 'egg rolls'],
+      'Iron': ['steak', 'beef', 'burger', 'ground beef', 'roast', 'chicken', 'pork', 'turkey', 'bacon', 'lamb', 'spinach', 'beans', 'lentils', 'egg', 'eggs', 'tuna', 'shrimp', 'meat', 'donair', 'sausage'],
+      'Zinc': ['steak', 'beef', 'burger', 'pork', 'lamb', 'chicken', 'turkey', 'cheese', 'cheddar', 'seeds', 'nuts', 'beans', 'lentils', 'yogurt', 'eggs', 'egg', 'sausage'],
+      'Calcium': ['milk', 'cheese', 'cheddar', 'mozzarella', 'mozza', 'parmesan', 'yogurt', 'pizza', 'lasagna', 'quesadilla', 'feta', 'curd', 'poutine', 'dairy', 'cheestring', 'cheestrings', 'brie', 'havarti', 'quiche', 'dip'],
+      'Fiber': ['salad', 'broccoli', 'beans', 'lentils', 'rice', 'veggies', 'vegetables', 'apple', 'apples', 'berries', 'blueberries', 'banana', 'bananas', 'corn', 'cucumber', 'cucumbers', 'peppers', 'pasta', 'bread', 'spaghetti', 'potato', 'potatoes', 'sweet potato', 'samosa', 'samosas', 'egg roll', 'egg rolls', 'raisin bread'],
       'Vit C': ['peppers', 'bell pepper', 'broccoli', 'berries', 'blueberries', 'strawberries', 'orange', 'lemon', 'lime', 'tomato', 'tomatoes', 'salsa', 'cucumbers', 'cucumber', 'applesauce', 'applesnax'],
-      'Vit D': ['salmon', 'tuna', 'trout', 'fish', 'mushrooms', 'eggs', 'egg', 'milk', 'yogurt'],
+      'Vit D': ['salmon', 'tuna', 'trout', 'fish', 'mushrooms', 'eggs', 'egg', 'milk', 'yogurt', 'quiche'],
       'Omega-3': ['salmon', 'tuna', 'trout', 'fish', 'seafood', 'walnuts', 'chia', 'hemp', 'flax'],
       'Potassium': ['potato', 'potatoes', 'sweet potato', 'sweet potatoes', 'banana', 'bananas', 'avocado', 'tomato', 'tomatoes', 'squash', 'yogurt', 'milk'],
-      'Magnesium': ['pumpkin seed', 'pumpkin seeds', 'pepitas', 'nuts', 'cashews', 'almonds', 'peanut butter', 'spinach', 'beans', 'edamame', 'chia', 'hemp']
+      'Magnesium': ['pumpkin seed', 'pumpkin seeds', 'pepitas', 'nuts', 'cashews', 'almonds', 'peanut butter', 'spinach', 'beans', 'edamame', 'chia', 'hemp', 'artichoke']
     };
 
     function autoDetectNutrients(text) {
@@ -430,7 +526,162 @@
       return detected;
     }
 
-    // Dynamic Portion Calculation based on Tab 4 headcounts
+    /* ========================================================
+       IN-BROWSER CAMERA / RECEIPT / PANTRY OCR SCANNER
+       ======================================================== */
+    function triggerCameraScan(target) {
+      currentScanTarget = target;
+      var fileInput = document.getElementById('cameraFileInput');
+      if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      }
+    }
+
+    function handleImageScanned(event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      var progressModal = document.getElementById('ocrProgressModal');
+      var progressBar = document.getElementById('ocrProgressBar');
+      var progressStatus = document.getElementById('ocrProgressStatus');
+      progressModal.style.display = 'flex';
+      progressBar.style.width = '20%';
+      progressStatus.textContent = 'Analyzing image...';
+
+      if (typeof Tesseract === 'undefined') {
+        alert('OCR scanner library loading. Please verify internet connection and try again.');
+        progressModal.style.display = 'none';
+        return;
+      }
+
+      Tesseract.recognize(
+        file,
+        'eng',
+        {
+          logger: function(m) {
+            if (m.status === 'recognizing text') {
+              var pct = Math.round((m.progress || 0) * 100);
+              progressBar.style.width = Math.max(20, pct) + '%';
+              progressStatus.textContent = 'Reading text: ' + pct + '%';
+            }
+          }
+        }
+      ).then(function(result) {
+        progressModal.style.display = 'none';
+        var rawText = (result && result.data && result.data.text) || '';
+        processOcrText(rawText);
+      }).catch(function(err) {
+        progressModal.style.display = 'none';
+        console.error('OCR Error:', err);
+        alert('Could not read image clearly. Please try snapping under brighter lighting.');
+      });
+    }
+
+    // Filter out prices, taxes, totals, receipt barcodes, and transaction noise
+    function processOcrText(rawText) {
+      var lines = rawText.split('\n');
+      var cleanItems = [];
+      var ignorePatterns = [
+        /subtotal/i, /total/i, /hst/i, /gst/i, /pst/i, /tax/i, /cash/i, /visa/i, /mastercard/i, /debit/i, 
+        /interac/i, /change/i, /balance/i, /approved/i, /thank you/i, /member/i, /items sold/i, 
+        /auth/i, /sequence/i, /store/i, /phone/i, /invoice/i, /date/i, /time/i, /aid:/i, /pin/i
+      ];
+
+      lines.forEach(function(line) {
+        var trimmed = line.trim();
+        if (trimmed.length < 3) return;
+
+        // Skip receipt headers/footers/financials
+        for (var i = 0; i < ignorePatterns.length; i++) {
+          if (ignorePatterns[i].test(trimmed)) return;
+        }
+
+        // Clean out item numbers, barcodes, trailing prices (e.g., "123456 KS BACON 18.99 G")
+        var cleaned = trimmed
+          .replace(/^[\d\sE#\-\*\.]{3,10}\s+/, '') // leading item codes
+          .replace(/\s+[\$]?\d+[\.,]\d{2}.*$/, '') // trailing prices like $14.99 G
+          .replace(/[^a-zA-Z0-9\s\/\-\&\'\%\(\)]/g, ' ') // weird OCR junk symbols
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+
+        if (cleaned.length >= 3 && !/^\d+$/.test(cleaned)) {
+          if (cleanItems.indexOf(cleaned) === -1) {
+            cleanItems.push(cleaned);
+          }
+        }
+      });
+
+      if (cleanItems.length === 0) {
+        alert('No food items detected. Try taking a closer, steadier photo of the receipt or label.');
+        return;
+      }
+
+      openOcrReviewModal(cleanItems);
+    }
+
+    function openOcrReviewModal(items) {
+      pendingScannedItems = items;
+      var modal = document.getElementById('ocrReviewModal');
+      var list = document.getElementById('ocrDetectedItemsList');
+      var title = document.getElementById('ocrReviewTitle');
+      var confirmBtn = document.getElementById('ocrConfirmBtn');
+
+      title.textContent = currentScanTarget === 'haul' ? 'Review Receipt Items' : 'Review Pantry Items';
+      confirmBtn.textContent = currentScanTarget === 'haul' ? '✓ Add Selected to Haul' : '✓ Add Selected to Pantry';
+      list.innerHTML = '';
+
+      items.forEach(function(item, idx) {
+        var row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs';
+        row.innerHTML = 
+          '<input type="checkbox" id="ocr_chk_' + idx + '" checked class="w-4 h-4 rounded text-red-600 focus:ring-0 cursor-pointer">' +
+          '<input type="text" id="ocr_txt_' + idx + '" value="' + item.replace(/"/g, '&quot;') + '" class="flex-1 px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-red-500">';
+        list.appendChild(row);
+      });
+
+      modal.style.display = 'flex';
+    }
+
+    function closeOcrReviewModal() {
+      document.getElementById('ocrReviewModal').style.display = 'none';
+    }
+
+    function confirmScannedItems() {
+      var addedCount = 0;
+      pendingScannedItems.forEach(function(orig, idx) {
+        var chk = document.getElementById('ocr_chk_' + idx);
+        var txt = document.getElementById('ocr_txt_' + idx);
+        if (chk && chk.checked && txt) {
+          var val = txt.value.trim();
+          if (val) {
+            if (currentScanTarget === 'haul') {
+              state.items.push({ id: Date.now() + idx, name: val, store: 'Costco / Grocery' });
+            } else {
+              state.pantry.push({ cat: 'General Pantry', name: val, status: 'stocked' });
+            }
+            addedCount++;
+          }
+        }
+      });
+
+      closeOcrReviewModal();
+
+      if (currentScanTarget === 'haul') {
+        renderItems();
+        switchTab('tab-groceries');
+      } else {
+        renderPantry();
+        switchTab('tab-pantry');
+      }
+
+      syncToCloud();
+      alert('Successfully added ' + addedCount + ' items to your ' + (currentScanTarget === 'haul' ? 'Haul list!' : 'Pantry inventory!'));
+    }
+
+    /* ========================================================
+       PORTIONS & HEADCOUNT
+       ======================================================== */
     function getDynamicPortionText(dayName) {
       var fam = state.family || { adults: 2, kids: 1, guests: 0 };
       var adults = fam.adults || 2;
@@ -563,7 +814,7 @@
       for (var catName in cats) {
         var catBox = document.createElement('div');
         catBox.className = 'border border-slate-200 dark:border-slate-800 rounded-lg p-3 space-y-2 bg-slate-50/50 dark:bg-slate-900/50';
-        var heading = '<h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">' + catName + '</h3>';
+        var heading = '<h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">' + catName + ' (' + cats[catName].length + ')</h3>';
         var listHtml = '<div class="space-y-1.5">';
 
         cats[catName].forEach(function(entry) {
@@ -579,6 +830,16 @@
         catBox.innerHTML = heading + listHtml;
         container.appendChild(catBox);
       }
+
+      var pCount = document.getElementById('pantryCountLabel');
+      if (pCount) pCount.textContent = state.pantry.length + ' household items tracked';
+    }
+
+    function resetToVerifiedStock() {
+      if (!confirm('Reload all verified spices, seasonings, and freezer staples from your photos?')) return;
+      state.pantry = VERIFIED_PANTRY_STOCK.slice();
+      renderPantry();
+      syncToCloud();
     }
 
     function addNewPantryItem() {
@@ -917,7 +1178,6 @@
         '</div>';
       }
 
-      // Dynamic Portions text based on Tab 4 headcount
       var dynamicPortionString = getDynamicPortionText(meal.day || weekDays[idx]);
 
       var recipeDetailsHtml = '';
@@ -1056,7 +1316,7 @@
             timing: 'Prep: 5 min | Cook: 15 min',
             steps: [
               'Cook bacon strips in skillet over medium heat until crispy (6-7 min). Transfer to plate, leave 1 tbsp drippings in pan.',
-              'Season chicken with salt, pepper, garlic powder. Cook in skillet over medium heat for 6-7 min per side until 165°F.',
+              'Season chicken with Montreal Chicken Seasoning or garlic powder. Cook in skillet over medium heat for 6-7 min per side until 165°F.',
               'Top chicken with Havarti or Marble Cheddar to melt. Toast brioche bun halves in pan for 1 min.',
               'Plating: Assemble melts with mayo and serve with fresh sliced cucumbers.'
             ],
@@ -1121,13 +1381,13 @@
           },
           backups: [
             {
-              title: 'Cheesy Scrambled Eggs & Toasted Ciabatta',
-              gear: 'Skillet & Toaster (8 min)',
+              title: 'Cuisine Adventures Mini Quiches & Sliced Fruit',
+              gear: 'Air Fryer (375°F / 10 min)',
               freshness: 'high',
-              timing: 'Prep: 2 min | Cook: 6 min',
-              steps: ['Scramble eggs in melted butter; fold in grated cheddar at the end.', 'Serve with toasted ciabatta.'],
+              timing: 'Prep: 1 min | Cook: 10 min',
+              steps: ['Bake frozen mini quiches at 375°F for 10-12 min until hot and golden.', 'Serve with fresh blueberries or sliced bananas.'],
               nutrients: ['Vit D', 'Calcium', 'Iron', 'Zinc'],
-              thaw: 'None.'
+              thaw: 'None (cook straight from freezer).'
             }
           ],
           isOverridden: false,
@@ -1161,11 +1421,11 @@
           },
           backups: [
             {
-              title: 'Motor City Detroit Pizza (Fast Pivot)',
-              gear: 'Oven (425°F)',
+              title: 'Roman Meat Lasagna (Individual Bake)',
+              gear: 'Oven / Microwave',
               freshness: 'mid',
-              timing: 'Prep: 1 min | Cook: 19 min',
-              steps: ['Bake at 425°F for 19 min.', 'Slice into squares.'],
+              timing: 'Prep: 1 min | Cook: 35 min',
+              steps: ['Bake Roman single-serve lasagna tray in oven at 375°F or microwave per box instructions.', 'Serve with sliced cucumbers.'],
               nutrients: ['Calcium', 'Iron'],
               thaw: 'None.'
             }
@@ -1239,14 +1499,14 @@
           effort: 'standard',
           selectedBackupIndex: null,
           standard: {
-            title: 'Minh Egg Rolls & Veggie Samosas with Cheesy Garlic Ciabatta', 
+            title: 'Minh Egg Rolls & Chicken Samosas with Cheesy Garlic Ciabatta', 
             gear: 'Air Fryer (375°F / 190°C) & Toaster', 
             freshness: 'low',
             timing: 'Prep: 5 min | Cook: 14 min',
             steps: [
-              'Place egg rolls and samosas in air fryer at 375°F for 12-14 min, shaking halfway.',
+              'Place egg rolls and chicken samosas in air fryer at 375°F for 12-14 min, shaking halfway.',
               'Slice ciabatta buns, spread butter, garlic powder, top with cheese, and toast until bubbling.',
-              'Slice fresh cucumber rounds and serve with dipping sauces.'
+              'Slice fresh cucumber rounds and serve with sweet dipping sauces.'
             ],
             thaw: 'None (air fry straight from freezer).',
             nutrients: ['Fiber', 'Calcium', 'Vit C', 'Potassium']
@@ -1260,7 +1520,17 @@
             thaw: 'None.',
             nutrients: ['Fiber', 'Calcium']
           },
-          backups: [],
+          backups: [
+            {
+              title: 'Mr. Donair Donair Dunkers with Warm Sweet Dip',
+              gear: 'Air Fryer (375°F / 10 min)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 10 min',
+              steps: ['Air fry Donair Dunkers at 375°F for 9-11 min until crispy.', 'Warm donair dipping sauce and serve with sliced cucumber.'],
+              nutrients: ['Iron', 'Zinc', 'Calcium'],
+              thaw: 'None.'
+            }
+          ],
           isOverridden: false,
           actualMade: ''
         },
@@ -1275,7 +1545,7 @@
             timing: 'Prep: 5 min | Cook: 15 min',
             steps: [
               'Boil spaghettini in salted water for 8 min. Reserve 1/4 cup pasta water, drain, and toss with butter.',
-              'Season chicken breasts. Pan-sear in skillet with butter/oil over medium heat for 6-7 min per side until 165°F.',
+              'Season chicken breasts with Montreal Chicken or salt & pepper. Pan-sear in skillet with butter/oil over medium heat for 6-7 min per side until 165°F.',
               'Toss hot pasta with reserved cooking water and finely grated Beemster cheese until a silky sauce coats noodles.',
               'Serve pasta topped with sliced chicken breast and fresh cucumber rounds.'
             ],
@@ -1448,6 +1718,8 @@
       var savedPantry = localStorage.getItem('prantry_items') || localStorage.getItem('prince_pantry');
       if (savedPantry) {
         try { state.pantry = JSON.parse(savedPantry); } catch(e){}
+      } else {
+        state.pantry = VERIFIED_PANTRY_STOCK.slice();
       }
       var savedPlan = localStorage.getItem('prince_plan');
       if (savedPlan) {
