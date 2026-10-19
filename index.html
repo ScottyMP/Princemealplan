@@ -46,7 +46,7 @@
       <div class="flex items-center gap-2">
         <button type="button" onclick="openCloudModal()" id="cloudStatusBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-          <span id="cloudStatusText">Local Mode</span>
+          <span id="cloudStatusText">Connecting...</span>
         </button>
 
         <button type="button" onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">
@@ -140,7 +140,6 @@
 
     <!-- TAB 3: DINNERS & NUTRIENT TRACKER -->
     <section id="tab-plan" class="hidden space-y-4">
-      
       <!-- Weekly Micronutrient Audit Card -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2.5">
         <div class="flex items-center justify-between">
@@ -189,19 +188,19 @@
 
   </main>
 
-  <!-- Cloud Sync Modal -->
+  <!-- Cloud Sync Modal (Kept for optional backup settings) -->
   <div id="cloudModal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl">
       <div class="flex items-center justify-between">
-        <h3 class="font-extrabold text-sm">Google Cloud Sync Setup</h3>
+        <h3 class="font-extrabold text-sm">Cloud Connection Status</h3>
         <button type="button" onclick="closeCloudModal()" class="text-slate-400 hover:text-slate-600 p-1">✕</button>
       </div>
-      <p class="text-xs text-slate-500">Connect to your Firebase database to sync groceries, pantry, and dinner logs between devices.</p>
+      <p class="text-xs text-slate-500">Your app is configured to automatically sync using Family PIN 1989.</p>
 
       <div class="space-y-3 text-xs">
         <div>
           <label class="block font-bold mb-1">Family PIN</label>
-          <input type="text" id="cfgFamilyPin" placeholder="e.g. 1989" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700">
+          <input type="text" id="cfgFamilyPin" class="w-full px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700">
         </div>
         <div>
           <label class="block font-bold mb-1">Firebase Configuration JSON</label>
@@ -210,13 +209,25 @@
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button type="button" onclick="saveCloudConfig()" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-red-700">Save & Connect</button>
-        <button type="button" onclick="closeCloudModal()" class="px-3 py-2 border rounded-lg text-xs font-semibold">Cancel</button>
+        <button type="button" onclick="saveCloudConfig()" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-red-700">Save</button>
+        <button type="button" onclick="closeCloudModal()" class="px-3 py-2 border rounded-lg text-xs font-semibold">Close</button>
       </div>
     </div>
   </div>
 
   <script>
+    // HARDCODED DEFAULT FIREBASE CONFIGURATION
+    var DEFAULT_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAzP-wJ6D42SigyQAm86buBSnaE23ku4Qc",
+      authDomain: "prince-meal-plan.firebaseapp.com",
+      databaseURL: "https://prince-meal-plan-default-rtdb.firebaseio.com",
+      projectId: "prince-meal-plan",
+      storageBucket: "prince-meal-plan.firebasestorage.app",
+      messagingSenderId: "39639917898",
+      appId: "1:39639917898:web:2cd2dc619156db63958db3"
+    };
+    var DEFAULT_FAMILY_PIN = "1989";
+
     var state = {
       items: [
         { id: 1, name: 'Kirkland Boneless Chicken Breasts', store: 'Costco' },
@@ -385,6 +396,13 @@
       syncToCloud();
     }
 
+    function getActiveRecipe(meal) {
+      if (meal.selectedBackupIndex !== undefined && meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) {
+        return meal.backups[meal.selectedBackupIndex];
+      }
+      return meal.effort === 'low' && meal.lowEffort ? meal.lowEffort : meal.standard;
+    }
+
     function renderNutrientScorecard() {
       var container = document.getElementById('nutrientScorecard');
       if (!container) return;
@@ -414,13 +432,6 @@
         div.innerHTML = '<div class="text-[10px] font-bold uppercase tracking-wider">' + nutr + '</div><div class="text-base font-extrabold mt-0.5">' + score + '<span class="text-[10px] font-normal opacity-70">/7d</span></div>';
         container.appendChild(div);
       });
-    }
-
-    function getActiveRecipe(meal) {
-      if (meal.selectedBackupIndex !== undefined && meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) {
-        return meal.backups[meal.selectedBackupIndex];
-      }
-      return meal.effort === 'low' && meal.lowEffort ? meal.lowEffort : meal.standard;
     }
 
     function toggleMealNutrient(mealIdx, nutr) {
@@ -454,7 +465,7 @@
 
     function toggleEffort(mealIdx) {
       var meal = state.plan[mealIdx];
-      meal.selectedBackupIndex = null; // reset backup selection if toggling
+      meal.selectedBackupIndex = null;
       meal.effort = meal.effort === 'standard' ? 'low' : 'standard';
       renderPlan();
       syncToCloud();
@@ -562,13 +573,11 @@
         });
         nutrientPills += '</div></div>';
 
-        // Swap Dropdown Options
         var swapOptions = weekDays.map(function(dName, dIdx) {
           if (dIdx === idx) return '';
           return '<option value="' + dIdx + '">Swap with ' + dName + '</option>';
         }).join('');
 
-        // Backup Options
         var backupOptions = '';
         if (meal.backups && meal.backups.length) {
           backupOptions = meal.backups.map(function(b, bIdx) {
@@ -586,7 +595,6 @@
           freshnessBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">❄️ Freezer</span>';
         }
 
-        // Energy Toggle Pill
         var energyBtn = meal.effort === 'low'
           ? '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ 10-Min Quick</button>'
           : '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200">⚡ Standard</button>';
@@ -961,8 +969,8 @@
 
     function openCloudModal() {
       var modal = document.getElementById('cloudModal');
-      document.getElementById('cfgFamilyPin').value = localStorage.getItem('prince_family_pin') || '';
-      document.getElementById('cfgFirebaseConfig').value = localStorage.getItem('prince_firebase_cfg') || '';
+      document.getElementById('cfgFamilyPin').value = localStorage.getItem('prince_family_pin') || DEFAULT_FAMILY_PIN;
+      document.getElementById('cfgFirebaseConfig').value = localStorage.getItem('prince_firebase_cfg') || JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
       modal.style.display = 'flex';
     }
 
@@ -972,7 +980,7 @@
     }
 
     function saveCloudConfig() {
-      var pin = document.getElementById('cfgFamilyPin').value.trim() || 'default_family';
+      var pin = document.getElementById('cfgFamilyPin').value.trim() || DEFAULT_FAMILY_PIN;
       var cfg = document.getElementById('cfgFirebaseConfig').value.trim();
       localStorage.setItem('prince_family_pin', pin);
       localStorage.setItem('prince_firebase_cfg', cfg);
@@ -982,11 +990,13 @@
 
     function initFirebase() {
       var configStr = localStorage.getItem('prince_firebase_cfg');
-      var pin = localStorage.getItem('prince_family_pin') || 'default_family';
-      if (!configStr) return;
+      var pin = localStorage.getItem('prince_family_pin') || DEFAULT_FAMILY_PIN;
+      var config = DEFAULT_FIREBASE_CONFIG;
+      if (configStr) {
+        try { config = JSON.parse(configStr); } catch (e) {}
+      }
 
       try {
-        var config = JSON.parse(configStr);
         if (typeof firebase !== 'undefined' && !firebase.apps.length) {
           firebase.initializeApp(config);
         }
@@ -1015,6 +1025,9 @@
             updateThawBannerUI();
           }
           updateCloudBadge(true);
+        }, function(error) {
+          console.error("Firebase read error:", error);
+          updateCloudBadge(false);
         });
       } catch (err) {
         console.error('Firebase error:', err);
