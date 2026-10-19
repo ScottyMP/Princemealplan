@@ -188,7 +188,7 @@
 
   </main>
 
-  <!-- Cloud Sync Modal (Kept for optional backup settings) -->
+  <!-- Cloud Sync Modal -->
   <div id="cloudModal" style="display: none;" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl">
       <div class="flex items-center justify-between">
@@ -216,7 +216,6 @@
   </div>
 
   <script>
-    // HARDCODED DEFAULT FIREBASE CONFIGURATION
     var DEFAULT_FIREBASE_CONFIG = {
       apiKey: "AIzaSyAzP-wJ6D42SigyQAm86buBSnaE23ku4Qc",
       authDomain: "prince-meal-plan.firebaseapp.com",
@@ -298,6 +297,56 @@
 
     var standardNutrients = ['Iron', 'Calcium', 'Fiber', 'Vit C', 'Vit D', 'Zinc', 'Omega-3'];
     var weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    // Keyword matching dictionary for automatic nutrient detection
+    var NUTRIENT_KEYWORDS = {
+      'Iron': ['steak', 'beef', 'burger', 'ground beef', 'roast', 'chicken', 'pork', 'turkey', 'bacon', 'lamb', 'spinach', 'beans', 'lentils', 'egg', 'eggs', 'tuna', 'shrimp', 'meat'],
+      'Zinc': ['steak', 'beef', 'burger', 'pork', 'lamb', 'chicken', 'turkey', 'cheese', 'cheddar', 'seeds', 'nuts', 'beans', 'lentils', 'yogurt', 'eggs', 'egg'],
+      'Calcium': ['milk', 'cheese', 'cheddar', 'mozzarella', 'mozza', 'parmesan', 'yogurt', 'pizza', 'lasagna', 'quesadilla', 'feta', 'curd', 'poutine', 'dairy', 'cheestring', 'cheestrings', 'brie', 'havarti'],
+      'Fiber': ['salad', 'broccoli', 'beans', 'lentils', 'rice', 'veggies', 'vegetables', 'apple', 'apples', 'berries', 'blueberries', 'banana', 'bananas', 'corn', 'cucumber', 'cucumbers', 'peppers', 'pasta', 'bread', 'spaghetti', 'potato', 'potatoes', 'sweet potato', 'samosa', 'samosas', 'egg roll', 'egg rolls'],
+      'Vit C': ['peppers', 'bell pepper', 'broccoli', 'berries', 'blueberries', 'strawberries', 'orange', 'lemon', 'lime', 'tomato', 'tomatoes', 'salsa', 'cucumbers', 'cucumber', 'applesauce', 'applesnax'],
+      'Vit D': ['salmon', 'tuna', 'trout', 'fish', 'mushrooms', 'eggs', 'egg', 'milk', 'yogurt'],
+      'Omega-3': ['salmon', 'tuna', 'trout', 'fish', 'seafood', 'walnuts', 'chia', 'flax']
+    };
+
+    function autoDetectNutrients(text) {
+      if (!text) return [];
+      var lower = ' ' + text.toLowerCase().replace(/[^a-z0-9]/g, ' ') + ' ';
+      var detected = [];
+      for (var nutr in NUTRIENT_KEYWORDS) {
+        var words = NUTRIENT_KEYWORDS[nutr];
+        for (var i = 0; i < words.length; i++) {
+          var w = ' ' + words[i].toLowerCase() + ' ';
+          var wPlural = ' ' + words[i].toLowerCase() + 's ';
+          if (lower.indexOf(w) !== -1 || lower.indexOf(wPlural) !== -1) {
+            if (detected.indexOf(nutr) === -1) {
+              detected.push(nutr);
+            }
+            break;
+          }
+        }
+      }
+      return detected;
+    }
+
+    function getActiveRecipe(meal) {
+      if (!meal) return {};
+      var base;
+      if (meal.selectedBackupIndex !== undefined && meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) {
+        base = meal.backups[meal.selectedBackupIndex];
+      } else if (meal.effort === 'low' && meal.lowEffort) {
+        base = meal.lowEffort;
+      } else if (meal.standard) {
+        base = meal.standard;
+      } else {
+        base = meal;
+      }
+
+      if (meal.isOverridden && meal.overrideNutrients) {
+        return Object.assign({}, base, { nutrients: meal.overrideNutrients });
+      }
+      return base;
+    }
 
     function renderItems() {
       var list = document.getElementById('groceryItemList');
@@ -396,13 +445,6 @@
       syncToCloud();
     }
 
-    function getActiveRecipe(meal) {
-      if (meal.selectedBackupIndex !== undefined && meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) {
-        return meal.backups[meal.selectedBackupIndex];
-      }
-      return meal.effort === 'low' && meal.lowEffort ? meal.lowEffort : meal.standard;
-    }
-
     function renderNutrientScorecard() {
       var container = document.getElementById('nutrientScorecard');
       if (!container) return;
@@ -411,14 +453,17 @@
       var counts = {};
       standardNutrients.forEach(function(n) { counts[n] = 0; });
 
-      state.plan.forEach(function(meal) {
-        var activeRecipe = getActiveRecipe(meal);
-        if (activeRecipe.nutrients && Array.isArray(activeRecipe.nutrients)) {
-          activeRecipe.nutrients.forEach(function(n) {
-            if (counts[n] !== undefined) counts[n]++;
-          });
-        }
-      });
+      if (Array.isArray(state.plan)) {
+        state.plan.forEach(function(meal) {
+          if (!meal) return;
+          var activeRecipe = getActiveRecipe(meal);
+          if (activeRecipe && activeRecipe.nutrients && Array.isArray(activeRecipe.nutrients)) {
+            activeRecipe.nutrients.forEach(function(n) {
+              if (counts[n] !== undefined) counts[n]++;
+            });
+          }
+        });
+      }
 
       standardNutrients.forEach(function(nutr) {
         var score = counts[nutr] || 0;
@@ -436,14 +481,22 @@
 
     function toggleMealNutrient(mealIdx, nutr) {
       var meal = state.plan[mealIdx];
+      if (!meal) return;
       var r = getActiveRecipe(meal);
-      if (!r.nutrients) r.nutrients = [];
-      var pos = r.nutrients.indexOf(nutr);
+      var currentList = (r && r.nutrients) ? r.nutrients.slice() : [];
+      var pos = currentList.indexOf(nutr);
       if (pos > -1) {
-        r.nutrients.splice(pos, 1);
+        currentList.splice(pos, 1);
       } else {
-        r.nutrients.push(nutr);
+        currentList.push(nutr);
       }
+
+      if (meal.isOverridden) {
+        meal.overrideNutrients = currentList;
+      } else {
+        r.nutrients = currentList;
+      }
+
       renderPlan();
       syncToCloud();
     }
@@ -453,13 +506,28 @@
       meal.isOverridden = !meal.isOverridden;
       if (!meal.isOverridden) {
         meal.actualMade = '';
+        delete meal.overrideNutrients;
       }
       renderPlan();
       syncToCloud();
     }
 
     function updateActualMealText(mealIdx, val) {
-      state.plan[mealIdx].actualMade = val;
+      if (state.plan && state.plan[mealIdx]) {
+        state.plan[mealIdx].actualMade = val;
+      }
+    }
+
+    // Auto-detects nutrients and syncs when user leaves the input or presses Enter
+    function saveCustomMealText(mealIdx) {
+      var meal = state.plan[mealIdx];
+      if (!meal) return;
+      var text = meal.actualMade || '';
+      var detected = autoDetectNutrients(text);
+      if (detected.length > 0) {
+        meal.overrideNutrients = detected;
+      }
+      renderPlan();
       syncToCloud();
     }
 
@@ -523,8 +591,13 @@
       if (!container) return;
       container.innerHTML = '';
 
+      if (!Array.isArray(state.plan) || !state.plan.length) {
+        generatePlan();
+      }
+
       state.plan.forEach(function(meal, idx) {
-        var active = getActiveRecipe(meal);
+        if (!meal) return;
+        var active = getActiveRecipe(meal) || {};
         var div = document.createElement('div');
         div.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3';
 
@@ -535,13 +608,13 @@
         var overrideInput = '';
         if (meal.isOverridden) {
           overrideInput = '<div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 space-y-1">' +
-            '<label class="block text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase">What did you actually make?</label>' +
-            '<input type="text" value="' + (meal.actualMade || '') + '" oninput="updateActualMealText(' + idx + ', this.value)" placeholder="e.g. Scrambled eggs & sourdough, or takeout..." class="w-full px-2.5 py-1.5 text-xs rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500">' +
+            '<label class="block text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase">What did you actually make? (Auto-tags nutrients)</label>' +
+            '<input type="text" value="' + (meal.actualMade || '') + '" oninput="updateActualMealText(' + idx + ', this.value)" onblur="saveCustomMealText(' + idx + ')" onkeydown="if(event.key===\'Enter\'){this.blur();}" placeholder="e.g. Steak and salad, scrambled eggs, salmon..." class="w-full px-2.5 py-1.5 text-xs rounded border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-amber-500">' +
           '</div>';
         }
 
         var recipeDetailsHtml = '';
-        if (active.steps && active.steps.length) {
+        if (active.steps && Array.isArray(active.steps) && active.steps.length) {
           var stepsLi = active.steps.map(function(s, stepIdx) {
             return '<li class="text-xs text-slate-600 dark:text-slate-300"><span class="font-bold text-slate-800 dark:text-slate-200">' + (stepIdx + 1) + '.</span> ' + s + '</li>';
           }).join('');
@@ -555,9 +628,9 @@
               '<div class="pt-3 space-y-2 border-t border-slate-200 dark:border-slate-700 mt-2">' +
                 '<div class="p-2 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px]">' +
                   '<span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">⚖️ Exact Family Portions:</span>' +
-                  '<span class="text-slate-600 dark:text-slate-400">' + active.portions + '</span>' +
+                  '<span class="text-slate-600 dark:text-slate-400">' + (active.portions || 'Scaled for 2 adults + 1 child') + '</span>' +
                 '</div>' +
-                '<div class="text-[11px] font-semibold text-slate-500">⏱️ ' + active.timing + '</div>' +
+                '<div class="text-[11px] font-semibold text-slate-500">⏱️ ' + (active.timing || '15 min') + '</div>' +
                 '<ol class="space-y-1.5 pl-1">' + stepsLi + '</ol>' +
               '</div>' +
             '</details>';
@@ -602,7 +675,7 @@
         div.innerHTML = 
           '<div class="flex items-center justify-between">' +
             '<div class="flex items-center gap-1.5">' +
-              '<span class="text-xs font-black uppercase tracking-wider text-red-600 dark:text-red-400">' + meal.day + '</span>' +
+              '<span class="text-xs font-black uppercase tracking-wider text-red-600 dark:red-400">' + (meal.day || weekDays[idx]) + '</span>' +
               freshnessBadge +
               energyBtn +
             '</div>' +
@@ -616,23 +689,23 @@
           '</div>' +
           '<div>' +
             '<div class="flex items-center justify-between">' +
-              '<div class="text-[10px] font-medium text-slate-400 mb-0.5">' + active.gear + '</div>' +
+              '<div class="text-[10px] font-medium text-slate-400 mb-0.5">' + (active.gear || 'Stove / Skillet') + '</div>' +
               (meal.backups && meal.backups.length ? 
                 '<select onchange="selectBackupMeal(' + idx + ', this.value)" class="text-[10px] font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-slate-600 dark:text-slate-300">' +
                   '<option value="">💡 Pick Backup...</option>' + backupOptions +
                 '</select>' : '') +
             '</div>' +
-            '<h3 class="text-sm font-bold ' + (meal.isOverridden ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-100') + '">' + active.title + '</h3>' +
+            '<h3 class="text-sm font-bold ' + (meal.isOverridden ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-100') + '">' + (active.title || 'Dinner') + '</h3>' +
           '</div>' +
           overrideInput +
           recipeDetailsHtml +
           '<div class="p-2.5 rounded-lg bg-blue-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">' +
             '<span class="font-bold text-blue-900 dark:text-blue-300">👦 6yo Plate: </span>' +
-            '<span class="text-slate-700 dark:text-slate-300">' + active.kidTweak + '</span>' +
+            '<span class="text-slate-700 dark:text-slate-300">' + (active.kidTweak || 'Deconstructed plate with mild side dip.') + '</span>' +
           '</div>' +
           nutrientPills +
           '<div class="flex items-center gap-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400 pt-1 border-t border-slate-100 dark:border-slate-800">' +
-            '<span>❄️ Thaw Alert:</span><span>' + active.thaw + '</span>' +
+            '<span>❄️ Thaw Alert:</span><span>' + (active.thaw || 'None needed.') + '</span>' +
           '</div>';
 
         container.appendChild(div);
@@ -1018,7 +1091,10 @@
           if (val && val.plan) {
             state.plan = val.plan;
             localStorage.setItem('prince_plan', JSON.stringify(state.plan));
-            renderPlan();
+            var activeEl = document.activeElement;
+            if (!activeEl || activeEl.tagName !== 'INPUT') {
+              renderPlan();
+            }
           }
           if (val && val.thawDone !== undefined) {
             state.thawDone = val.thawDone;
@@ -1060,7 +1136,7 @@
         txt.textContent = 'Synced';
       } else {
         pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer';
-        txt.textContent = 'Local Mode';
+        txt.textContent = 'Connecting...';
       }
     }
 
@@ -1069,7 +1145,7 @@
       if (savedItems) {
         try { state.items = JSON.parse(savedItems); } catch(e){}
       }
-      var savedPantry = localStorage.getItem('prince_pantry');
+      var savedPantry = localStorage.getItem('prantry_items') || localStorage.getItem('prince_pantry');
       if (savedPantry) {
         try { state.pantry = JSON.parse(savedPantry); } catch(e){}
       }
