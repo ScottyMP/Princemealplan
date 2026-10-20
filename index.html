@@ -93,13 +93,12 @@
           <button type="button" onclick="addManualItem()" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
-        <!-- 1-Click Load & Bulk Paste Options -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
           <button type="button" onclick="openBulkImportModal('haul')" class="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
-            <span>📋</span> Bulk Paste / Import Text
+            <span>📋</span> Bulk Paste / Import Haul
           </button>
-          <button type="button" onclick="loadCostcoScannedHaul()" class="w-full py-2.5 px-3 rounded-lg bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
-            <span>📥</span> Load Costco Haul (32 Items)
+          <button type="button" onclick="shareToGoogleKeep()" class="w-full py-2.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>📤</span> Export to Google Keep
           </button>
         </div>
 
@@ -118,7 +117,7 @@
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
         <div class="flex items-center justify-between mb-3">
           <div>
-            <h2 class="text-sm font-bold">Active Haul & Cupboard</h2>
+            <h2 class="text-sm font-bold">Active Haul / Shopping List</h2>
             <p class="text-xs text-slate-500" id="itemCountLabel">Loading items...</p>
           </div>
           <button type="button" onclick="clearAllItems()" class="text-xs text-red-600 dark:text-red-400 font-medium hover:underline">Clear List</button>
@@ -133,14 +132,15 @@
         <div class="flex items-center justify-between">
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add Household Staple</h2>
           <button type="button" onclick="openBulkImportModal('pantry')" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 hover:underline">
-            <span>📋</span> Bulk Paste Items
+            <span>✨</span> Smart Bulk Paste (Auto-Sorts)
           </button>
         </div>
-        <p class="text-[11px] text-slate-500">Items you keep in stock. Tap <strong>"Low"</strong> whenever you run out to send it to Tab 1 (Haul).</p>
+        <p class="text-[11px] text-slate-500">Items you keep in stock. Marking <strong>"Low"</strong> or deleting will auto-swap dependent dinners and send to your grocery list.</p>
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-          <input type="text" id="newPantryItemName" placeholder="e.g. Avocado Oil, Hemp Hearts..." class="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <input type="text" id="newPantryItemName" placeholder="e.g. Sirloin Steak, Avocado Oil..." class="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
           <select id="newPantryItemCat" class="px-2.5 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+            <option value="AUTO">✨ Auto-Detect Category</option>
             <option value="Freezer Meats & Seafood">Freezer Meats & Seafood</option>
             <option value="Freezer Meals & Prepared">Freezer Meals & Prepared</option>
             <option value="Oils, Sprays & Condiments">Oils, Sprays & Condiments</option>
@@ -153,11 +153,11 @@
           </select>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <button type="button" onclick="addNewPantryItem()" class="py-2 bg-red-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-98">
-            + Add to Permanent Pantry
+          <button type="button" onclick="addNewPantryItem()" class="py-2.5 bg-red-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-98">
+            + Add Single Item
           </button>
-          <button type="button" onclick="openBulkImportModal('pantry')" class="py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-emerald-700 active:scale-98 flex items-center justify-center gap-1.5">
-            <span>📋</span> Bulk Paste Multiple Staples
+          <button type="button" onclick="openBulkImportModal('pantry')" class="py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-emerald-700 active:scale-98 flex items-center justify-center gap-1.5">
+            <span>✨</span> Paste Mixed List (Auto-Categorizes)
           </button>
         </div>
       </div>
@@ -168,8 +168,8 @@
             <h2 class="text-sm font-bold">Pantry & Freezer Inventory</h2>
             <p class="text-xs text-slate-500" id="pantryCountLabel">Persistent household stock</p>
           </div>
-          <button type="button" onclick="resetToVerifiedStock()" class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold hover:underline">
-            ↺ Reload Stocked Inventory
+          <button type="button" onclick="safeSyncStaples()" class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+            ↺ Restore Missing Staples
           </button>
         </div>
         <div id="pantryCategoriesContainer" class="space-y-4 pt-1"></div>
@@ -279,21 +279,22 @@
 
   </main>
 
-  <!-- BULK PASTE / IMPORT MODAL -->
+  <!-- BULK PASTE / AUTO-IMPORT MODAL -->
   <div id="bulkImportModal" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-3.5 shadow-2xl">
       <div class="flex items-center justify-between">
         <div>
-          <h3 class="text-sm font-extrabold" id="bulkImportTitle">Bulk Paste & Import</h3>
-          <p class="text-[11px] text-slate-500">Paste your list below (one item per line).</p>
+          <h3 class="text-sm font-extrabold" id="bulkImportTitle">Smart Bulk Import</h3>
+          <p class="text-[11px] text-slate-500">Paste your entire list below. Items auto-categorize!</p>
         </div>
         <button type="button" onclick="closeBulkImportModal()" class="text-slate-400 hover:text-slate-600 p-1 font-bold">✕</button>
       </div>
 
       <div class="space-y-2">
         <div id="bulkPantryCategoryWrapper" class="hidden">
-          <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Select Pantry Category</label>
+          <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Target Category</label>
           <select id="bulkImportCategory" class="w-full text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-700 dark:text-slate-200">
+            <option value="AUTO" selected>✨ Auto-Categorize Everything (Recommended)</option>
             <option value="Freezer Meats & Seafood">Freezer Meats & Seafood</option>
             <option value="Freezer Meals & Prepared">Freezer Meals & Prepared</option>
             <option value="Oils, Sprays & Condiments">Oils, Sprays & Condiments</option>
@@ -306,12 +307,12 @@
           </select>
         </div>
 
-        <textarea id="bulkImportText" rows="6" placeholder="Paste items here, e.g.:&#10;Basa Fillets&#10;Chicken Wings&#10;POM White Bread" class="w-full p-2.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"></textarea>
+        <textarea id="bulkImportText" rows="7" placeholder="Paste items here, e.g.:&#10;Basa Fillets&#10;Rao's Marinara Sauce&#10;Large Eggs&#10;Chia Seeds&#10;Primo Capellini Pasta" class="w-full p-2.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"></textarea>
       </div>
 
       <div class="flex gap-2 pt-1">
         <button type="button" onclick="processBulkImport()" class="flex-1 py-2 bg-emerald-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-emerald-700 active:scale-98">
-          ✓ Import All Items
+          ✓ Auto-Sort & Import All
         </button>
         <button type="button" onclick="closeBulkImportModal()" class="px-3 py-2 border rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300">
           Cancel
@@ -359,51 +360,60 @@
     };
     var DEFAULT_FAMILY_PIN = "1989";
 
-    // Complete Verified Stock from All User Photos (Pantry, Spices, Freezers, and Fridge)
     var VERIFIED_PANTRY_STOCK = [
-      // Freezer Meats & Seafood
-      { cat: 'Freezer Meats & Seafood', name: 'Maple Leaf Prime Boneless Chicken Breasts', status: 'stocked' },
-      { cat: 'Freezer Meats & Seafood', name: 'Basa Fillets / Filets de Pangasius', status: 'stocked' },
-      { cat: 'Freezer Meats & Seafood', name: 'Frozen Chicken Wings (Bulk Ziploc)', status: 'stocked' },
-      { cat: 'Freezer Meats & Seafood', name: 'Frozen Chicken Drumsticks (Ziploc)', status: 'stocked' },
+      { cat: 'Freezer Meats & Seafood', name: 'Maple Leaf Prime Chicken Breasts', status: 'stocked' },
+      { cat: 'Freezer Meats & Seafood', name: 'Basa Fillets (Pangasius)', status: 'stocked' },
+      { cat: 'Freezer Meats & Seafood', name: 'Frozen Chicken Wings', status: 'stocked' },
+      { cat: 'Freezer Meats & Seafood', name: 'Frozen Chicken Drumsticks', status: 'stocked' },
       { cat: 'Freezer Meats & Seafood', name: 'Fresh Sausage Dinner Tray', status: 'stocked' },
       { cat: 'Freezer Meats & Seafood', name: 'Gold Label Thick Cut Bacon', status: 'stocked' },
-      { cat: 'Freezer Meats & Seafood', name: 'Ottawa Valley Meats (Ground / Steaks)', status: 'stocked' },
+      { cat: 'Freezer Meats & Seafood', name: 'Ottawa Valley Meats', status: 'stocked' },
+      { cat: 'Freezer Meats & Seafood', name: 'Breakfast Sausages', status: 'stocked' },
 
-      // Freezer Meals & Prepared
-      { cat: 'Freezer Meals & Prepared', name: 'Olivieri Butternut Squash & Mascarpone Ravioli', status: 'stocked' },
-      { cat: 'Freezer Meals & Prepared', name: 'Minh Pork Egg Rolls (16pk)', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Olivieri Butternut Squash Ravioli', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Minh Pork Egg Rolls', status: 'stocked' },
       { cat: 'Freezer Meals & Prepared', name: 'Chicken Samosas (Samosa au poulet)', status: 'stocked' },
-      { cat: 'Freezer Meals & Prepared', name: 'Motor City Detroit Double Pepperoni Pizza', status: 'stocked' },
-      { cat: 'Freezer Meals & Prepared', name: 'Cuisine Adventures Mini Quiches (3 Flavours)', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Motor City Detroit Pizza', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Cuisine Adventures Mini Quiches', status: 'stocked' },
       { cat: 'Freezer Meals & Prepared', name: 'Cuisine Adventures Spinach & Artichoke Dip', status: 'stocked' },
       { cat: 'Freezer Meals & Prepared', name: 'Mr. Donair Donair Dunkers', status: 'stocked' },
-      { cat: 'Freezer Meals & Prepared', name: 'Roman Meat Lasagna Tray', status: 'stocked' },
-      { cat: 'Freezer Meals & Prepared', name: 'Kirkland Italian Sausage & Beef Lasagna', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Roman Meat Lasagna', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Kirkland Italian Sausage Lasagna', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Pura Vida Fire Roasted Vegetable Mélange', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Tenderflake Deep Dish Pie Shells', status: 'stocked' },
+      { cat: 'Freezer Meals & Prepared', name: 'Frozen Breakfast Waffles', status: 'stocked' },
 
-      // Oils, Sprays & Condiments
+      { cat: 'Oils, Sprays & Condiments', name: 'Classico Tomato & Basil Pasta Sauce', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Rao\'s Homemade Marinara Sauce', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Pilaros Greek Olives', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Heinz Tomato Ketchup', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'French\'s Classic Yellow Mustard', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Pure Liquid Honey', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Kirkland Avocado Oil (Jug)', status: 'stocked' },
-      { cat: 'Oils, Sprays & Condiments', name: 'Extra Virgin Olive Oil (Tin)', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Extra Virgin Olive Oil', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Kirkland Canola Cooking Spray', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Culinary Traditions Chipotle Aioli', status: 'stocked' },
-      { cat: 'Oils, Sprays & Condiments', name: 'Frank\'s RedHot / Buffalo Sauce', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Frank\'s RedHot Sauce', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Creamy Roasted Garlic Vinaigrette', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Balsamic & Wine Vinegar', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Soy Sauce', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Kirkland Mayonnaise', status: 'stocked' },
       { cat: 'Oils, Sprays & Condiments', name: 'Pure Maple Syrup', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Chili Crisp', status: 'stocked' },
+      { cat: 'Oils, Sprays & Condiments', name: 'Homemade Apple Fig Chutney', status: 'stocked' },
 
-      // Fridge & Dairy
-      { cat: 'Fridge & Dairy', name: 'Starbucks Almond & Oat Pumpkin Spice Creamer', status: 'stocked' },
+      { cat: 'Fridge & Dairy', name: 'Large Eggs', status: 'stocked' },
+      { cat: 'Fridge & Dairy', name: 'Tre Stelle Feta Cheese', status: 'stocked' },
+      { cat: 'Fridge & Dairy', name: 'Armstrong Marble Cheddar Block', status: 'stocked' },
+      { cat: 'Fridge & Dairy', name: 'Neilson 2% Milk', status: 'stocked' },
+      { cat: 'Fridge & Dairy', name: 'Starbucks Pumpkin Spice Creamer', status: 'stocked' },
       { cat: 'Fridge & Dairy', name: 'Coffee Mate Caramel Macchiato Creamer', status: 'stocked' },
-      { cat: 'Fridge & Dairy', name: 'DanActive / Drinkable Yogurt', status: 'stocked' },
-      { cat: 'Fridge & Dairy', name: 'Marble Cheddar 2pk', status: 'stocked' },
+      { cat: 'Fridge & Dairy', name: 'Yop Drinkable Yogurt', status: 'stocked' },
       { cat: 'Fridge & Dairy', name: 'Havarti Variety Pack', status: 'stocked' },
       { cat: 'Fridge & Dairy', name: 'Beemster Aged Cheese', status: 'stocked' },
       { cat: 'Fridge & Dairy', name: 'Black Diamond Cheestrings 40pk', status: 'stocked' },
       { cat: 'Fridge & Dairy', name: 'Homo Milk 4L', status: 'stocked' },
 
-      // Spices & Seasoning Blends
       { cat: 'Spices & Seasoning Blends', name: 'Montreal Steak Spice (Club House La Grille)', status: 'stocked' },
       { cat: 'Spices & Seasoning Blends', name: 'Montreal Chicken Seasoning (Club House La Grille)', status: 'stocked' },
       { cat: 'Spices & Seasoning Blends', name: 'Maple Bacon Seasoning (Club House La Grille)', status: 'stocked' },
@@ -427,7 +437,6 @@
       { cat: 'Spices & Seasoning Blends', name: 'Onion Powder (Club House)', status: 'stocked' },
       { cat: 'Spices & Seasoning Blends', name: 'Ground Cinnamon (Club House)', status: 'stocked' },
 
-      // Herbs & Whole Spices
       { cat: 'Herbs & Whole Spices', name: 'Black Peppercorns (Grinder)', status: 'stocked' },
       { cat: 'Herbs & Whole Spices', name: 'Kosher Salt', status: 'stocked' },
       { cat: 'Herbs & Whole Spices', name: 'Thyme Leaves (Club House)', status: 'stocked' },
@@ -439,17 +448,22 @@
       { cat: 'Herbs & Whole Spices', name: 'Celery Seed (PC)', status: 'stocked' },
       { cat: 'Herbs & Whole Spices', name: 'Italian Herb Seasoning', status: 'stocked' },
 
-      // Baking, Grains & Breads
-      { cat: 'Baking, Grains & Breads', name: 'POM Ultra-Moelleux White Sandwich Bread', status: 'stocked' },
-      { cat: 'Baking, Grains & Breads', name: 'Sun-Maid Cinnamon Swirl Raisin Bread', status: 'stocked' },
+      { cat: 'Baking, Grains & Breads', name: 'Primo Capellini Pasta', status: 'stocked' },
+      { cat: 'Baking, Grains & Breads', name: 'Kirkland Signature Organic Quinoa', status: 'stocked' },
+      { cat: 'Baking, Grains & Breads', name: 'Classic Burger Buns', status: 'stocked' },
+      { cat: 'Baking, Grains & Breads', name: 'POM Ultra-Moelleux White Bread', status: 'stocked' },
+      { cat: 'Baking, Grains & Breads', name: 'Sun-Maid Raisin Cinnamon Swirl Bread', status: 'stocked' },
       { cat: 'Baking, Grains & Breads', name: 'Italian Style Breadcrumbs', status: 'stocked' },
       { cat: 'Baking, Grains & Breads', name: 'Jasmine Rice', status: 'stocked' },
       { cat: 'Baking, Grains & Breads', name: 'Garofalo Spaghettini', status: 'stocked' },
       { cat: 'Baking, Grains & Breads', name: 'Kraft Dinner', status: 'stocked' },
 
-      // Fruits, Sweets & Treats
-      { cat: 'Nuts, Seeds & Snacks', name: 'Kirkland Signature Three Berry Blend', status: 'stocked' },
-      { cat: 'Nuts, Seeds & Snacks', name: 'Jumbo Freeze Pops / Freezies', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Kirkland Signature Organic Chia Seeds', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Kirkland Signature Frozen Wild Blueberries', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Nature\'s Touch Frozen Tropical Fruit Blend', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Nestlé Drumstick Ice Cream Cones', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Oreo Cookies & Cream Ice Cream Tub', status: 'stocked' },
+      { cat: 'Nuts, Seeds & Snacks', name: 'Jumbo Freezies', status: 'stocked' },
       { cat: 'Nuts, Seeds & Snacks', name: 'Nesquik Strawberry Syrup', status: 'stocked' },
       { cat: 'Nuts, Seeds & Snacks', name: 'Kirkland PB Pretzels', status: 'stocked' }
     ];
@@ -473,7 +487,7 @@
 
     var currentDayIndex = 0;
     var selectedNutrientDetail = null;
-    var bulkImportTarget = 'haul';
+    var bulkImportTarget = 'pantry';
     var dbRef = null;
 
     var costcoScannedItems = [
@@ -557,9 +571,129 @@
       return detected;
     }
 
+    function autoCategorizePantryItem(name) {
+      var n = ' ' + name.toLowerCase().replace(/[^a-z0-9\s]/g, ' ') + ' ';
+      if (/seasoning|spice|salt|powder|masala|curry|cinnamon|turmeric|coriander|cumin|paprika|allspice|rub|dust|cajun|braai/.test(n) && !/salad|dressing|vinaigrette/.test(n)) {
+        return 'Spices & Seasoning Blends';
+      }
+      if (/thyme|rosemary|savory|dill|parsley|peppercorn|pepper|chilies|chili flake|celery seed|oregano|basil|bay leave/.test(n)) {
+        return 'Herbs & Whole Spices';
+      }
+      if (/pizza|lasagna|ravioli|samosa|egg roll|quiche|dunker|pie shell|waffle|waffles|m.lange|melange|fries|poutine|nugget|pierogi|perog|artichoke dip/.test(n)) {
+        return 'Freezer Meals & Prepared';
+      }
+      if (/chicken|beef|steak|pork|bacon|basa|fish|pangasius|wing|wings|drumstick|drumsticks|sausage|sausages|meat|salmon|tuna|turkey|lamb|shrimp/.test(n)) {
+        return 'Freezer Meats & Seafood';
+      }
+      if (/oil|spray|sauce|marinara|ketchup|mustard|mayo|mayonnaise|aioli|syrup|honey|dressing|vinaigrette|vinegar|chili crisp|chutney|olives|salsa/.test(n)) {
+        return 'Oils, Sprays & Condiments';
+      }
+      if (/milk|cheese|cheddar|feta|brie|havarti|curd|curds|yogurt|yop|egg|eggs|creamer|coffee mate|butter|margarine|sour cream/.test(n)) {
+        return 'Fridge & Dairy';
+      }
+      if (/bread|bun|buns|pasta|spaghetti|spaghettini|capellini|macaroni|noodle|noodles|rice|quinoa|oat|oats|flour|kd|kraft dinner|breadcrumb|breadcrumbs/.test(n)) {
+        return 'Baking, Grains & Breads';
+      }
+      if (/chia|seed|seeds|hemp|nut|nuts|pretzel|pretzels|ice cream|freezie|freezies|popsicle|berry|berries|blueberry|blueberries|fruit|oreo|chips|cracker|snack/.test(n)) {
+        return 'Nuts, Seeds & Snacks';
+      }
+      return 'General Pantry';
+    }
+
     /* ========================================================
-       BULK PASTE & IMPORT MODAL
+       AUTOMATIC DINNER REPLACEMENT ON REMOVAL
        ======================================================== */
+    function checkAndAutoSwapMeals(missingItemName) {
+      if (!missingItemName || !Array.isArray(state.plan)) return;
+      var query = missingItemName.toLowerCase().trim();
+
+      // Automatically add missing item to Tab 1 (Haul list) so you remember to buy it
+      var existsHaul = state.items.some(function(i) {
+        return i.name.toLowerCase().trim() === query;
+      });
+      if (!existsHaul) {
+        state.items.push({ id: Date.now(), name: missingItemName, store: 'Costco / Grocery' });
+        renderItems();
+      }
+
+      var swappedDays = [];
+      state.plan.forEach(function(meal, mIdx) {
+        if (!meal || meal.isOverridden) return;
+
+        // Check if current active meal relies on this item
+        var currentTitle = ((meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) 
+          ? meal.backups[meal.selectedBackupIndex].title 
+          : meal.standard.title).toLowerCase();
+
+        var matches = false;
+        // Check keywords
+        if (query.indexOf('chicken') !== -1 && currentTitle.indexOf('chicken') !== -1) matches = true;
+        if (query.indexOf('steak') !== -1 && currentTitle.indexOf('steak') !== -1) matches = true;
+        if (query.indexOf('bacon') !== -1 && currentTitle.indexOf('bacon') !== -1) matches = true;
+        if (query.indexOf('lasagna') !== -1 && currentTitle.indexOf('lasagna') !== -1) matches = true;
+        if (query.indexOf('taco') !== -1 && currentTitle.indexOf('taco') !== -1) matches = true;
+        if (query.indexOf('spaghetti') !== -1 && currentTitle.indexOf('spaghetti') !== -1) matches = true;
+        if (query.indexOf('pizza') !== -1 && currentTitle.indexOf('pizza') !== -1) matches = true;
+        if (currentTitle.indexOf(query) !== -1) matches = true;
+
+        if (matches) {
+          // Find first backup not containing missing ingredient
+          var foundBackup = false;
+          if (meal.backups && meal.backups.length) {
+            for (var b = 0; b < meal.backups.length; b++) {
+              if (meal.backups[b].title.toLowerCase().indexOf(query) === -1) {
+                meal.selectedBackupIndex = b;
+                meal.autoSwappedNote = 'Swapped from ' + meal.standard.title + ' (Missing ' + missingItemName + ')';
+                foundBackup = true;
+                break;
+              }
+            }
+          }
+          if (!foundBackup) {
+            // Emergency pivot to Detroit Pizza, Mini Quiches, or KD
+            meal.selectedBackupIndex = null;
+            meal.effort = 'low';
+            meal.autoSwappedNote = 'Pivoted to Quick Alternative (Missing ' + missingItemName + ')';
+          }
+          swappedDays.push(meal.day || weekDays[mIdx]);
+        }
+      });
+
+      if (swappedDays.length > 0) {
+        renderPlan();
+        alert('Notice: ' + missingItemName + ' is out of stock!\n\nDinners on ' + swappedDays.join(', ') + ' have been automatically pivoted to backup meals, and "' + missingItemName + '" was added to your Haul list.');
+      }
+    }
+
+    function shareToGoogleKeep() {
+      if (!state.items.length) {
+        alert('Your shopping haul list is empty! Nothing to export.');
+        return;
+      }
+      var textList = 'Costco & Grocery List:\n' + state.items.map(function(item) {
+        return '☐ ' + item.name + ' (' + (item.store || 'Costco') + ')';
+      }).join('\n');
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Grocery List',
+          text: textList
+        }).catch(function(e) {
+          copyListToClipboard(textList);
+        });
+      } else {
+        copyListToClipboard(textList);
+      }
+    }
+
+    function copyListToClipboard(text) {
+      navigator.clipboard.writeText(text).then(function() {
+        alert('Copied grocery list to clipboard!\n\nOpen Google Keep and paste directly into your note.');
+      }).catch(function() {
+        alert('Please copy your list from Tab 1.');
+      });
+    }
+
     function openBulkImportModal(target) {
       bulkImportTarget = target;
       var modal = document.getElementById('bulkImportModal');
@@ -572,8 +706,9 @@
         title.textContent = 'Bulk Paste to Haul (Tab 1)';
         catWrapper.classList.add('hidden');
       } else {
-        title.textContent = 'Bulk Paste to Pantry (Tab 2)';
+        title.textContent = 'Smart Bulk Import (Tab 2)';
         catWrapper.classList.remove('hidden');
+        document.getElementById('bulkImportCategory').value = 'AUTO';
       }
       modal.style.display = 'flex';
     }
@@ -588,17 +723,34 @@
 
       var lines = raw.split('\n');
       var added = 0;
-      var cat = document.getElementById('bulkImportCategory').value;
+      var skipped = 0;
+      var selectedCat = document.getElementById('bulkImportCategory').value;
 
       lines.forEach(function(line, idx) {
         var clean = line.replace(/^[\*\-\•\d\.\)]+/, '').trim();
         if (clean.length > 1) {
           if (bulkImportTarget === 'haul') {
-            state.items.push({ id: Date.now() + idx, name: clean, store: 'Costco / Grocery' });
+            var existsHaul = state.items.some(function(item) {
+              return item.name.toLowerCase().trim() === clean.toLowerCase().trim();
+            });
+            if (!existsHaul) {
+              state.items.push({ id: Date.now() + idx, name: clean, store: 'Costco / Grocery' });
+              added++;
+            } else {
+              skipped++;
+            }
           } else {
-            state.pantry.push({ cat: cat, name: clean, status: 'stocked' });
+            var targetCat = (selectedCat === 'AUTO') ? autoCategorizePantryItem(clean) : selectedCat;
+            var existsPantry = state.pantry.some(function(p) {
+              return p.name.toLowerCase().trim() === clean.toLowerCase().trim();
+            });
+            if (!existsPantry) {
+              state.pantry.push({ cat: targetCat, name: clean, status: 'stocked' });
+              added++;
+            } else {
+              skipped++;
+            }
           }
-          added++;
         }
       });
 
@@ -613,12 +765,31 @@
       }
 
       syncToCloud();
-      alert('Successfully added ' + added + ' items to your ' + (bulkImportTarget === 'haul' ? 'Haul list!' : 'Pantry inventory!'));
+      var msg = 'Added ' + added + ' items!';
+      if (skipped > 0) msg += ' (Skipped ' + skipped + ' duplicates already in your list)';
+      alert(msg);
     }
 
-    /* ========================================================
-       PORTIONS & HEADCOUNT
-       ======================================================== */
+    function safeSyncStaples() {
+      var addedCount = 0;
+      VERIFIED_PANTRY_STOCK.forEach(function(baseItem) {
+        var exists = state.pantry.some(function(p) {
+          return p.name.toLowerCase().trim() === baseItem.name.toLowerCase().trim();
+        });
+        if (!exists) {
+          state.pantry.push(Object.assign({}, baseItem));
+          addedCount++;
+        }
+      });
+      renderPantry();
+      syncToCloud();
+      if (addedCount > 0) {
+        alert('Restored ' + addedCount + ' verified staples! None of your custom items were removed.');
+      } else {
+        alert('All verified household staples are already present in your pantry!');
+      }
+    }
+
     function getDynamicPortionText(dayName) {
       var fam = state.family || { adults: 2, kids: 1, guests: 0 };
       var adults = fam.adults || 2;
@@ -772,13 +943,6 @@
       if (pCount) pCount.textContent = state.pantry.length + ' household items tracked';
     }
 
-    function resetToVerifiedStock() {
-      if (!confirm('Reload all verified spices, meats, and freezer staples from your photos?')) return;
-      state.pantry = VERIFIED_PANTRY_STOCK.slice();
-      renderPantry();
-      syncToCloud();
-    }
-
     function addNewPantryItem() {
       var nameInput = document.getElementById('newPantryItemName');
       var catSelect = document.getElementById('newPantryItemCat');
@@ -786,24 +950,35 @@
       var cat = catSelect.value;
       if (!name) return;
 
-      state.pantry.push({ cat: cat, name: name, status: 'stocked' });
-      nameInput.value = '';
-      renderPantry();
-      syncToCloud();
+      var finalCat = (cat === 'AUTO') ? autoCategorizePantryItem(name) : cat;
+      var exists = state.pantry.some(function(p) {
+        return p.name.toLowerCase().trim() === name.toLowerCase().trim();
+      });
+
+      if (!exists) {
+        state.pantry.push({ cat: finalCat, name: name, status: 'stocked' });
+        nameInput.value = '';
+        renderPantry();
+        syncToCloud();
+      } else {
+        alert('"' + name + '" is already in your pantry list!');
+      }
     }
 
     function deletePantryItem(index) {
-      if (!confirm('Remove this staple from your pantry list?')) return;
+      var itemName = state.pantry[index] ? state.pantry[index].name : '';
+      if (!confirm('Remove "' + itemName + '" from your pantry? This will check for any meals relying on it and add it to your shopping haul.')) return;
       state.pantry.splice(index, 1);
       renderPantry();
       syncToCloud();
+      checkAndAutoSwapMeals(itemName);
     }
 
     function togglePantryStock(index) {
       var p = state.pantry[index];
       if (p.status === 'stocked') {
         p.status = 'low';
-        quickAdd(p.name, 'Costco / Grocery');
+        checkAndAutoSwapMeals(p.name);
       } else {
         p.status = 'stocked';
       }
@@ -998,6 +1173,7 @@
     function toggleEffort(mealIdx) {
       var meal = state.plan[mealIdx];
       meal.selectedBackupIndex = null;
+      delete meal.autoSwappedNote;
       meal.effort = meal.effort === 'standard' ? 'low' : 'standard';
       renderPlan();
       syncToCloud();
@@ -1005,6 +1181,7 @@
 
     function selectBackupMeal(mealIdx, backupIdx) {
       var meal = state.plan[mealIdx];
+      delete meal.autoSwappedNote;
       if (backupIdx === "" || backupIdx === null) {
         meal.selectedBackupIndex = null;
       } else {
@@ -1012,6 +1189,17 @@
       }
       renderPlan();
       syncToCloud();
+    }
+
+    function revertAutoSwap(mealIdx) {
+      var meal = state.plan[mealIdx];
+      if (meal) {
+        meal.selectedBackupIndex = null;
+        meal.effort = 'standard';
+        delete meal.autoSwappedNote;
+        renderPlan();
+        syncToCloud();
+      }
     }
 
     function swapMeals(idxA, idxB) {
@@ -1115,6 +1303,19 @@
         '</div>';
       }
 
+      // Automatic Swap Alert Notice
+      var autoSwapAlertHtml = '';
+      if (meal.autoSwappedNote) {
+        autoSwapAlertHtml = 
+          '<div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-xs">' +
+            '<div class="flex items-center gap-2 overflow-hidden">' +
+              '<span>🔄</span>' +
+              '<span class="font-bold text-amber-900 dark:text-amber-200 truncate">' + meal.autoSwappedNote + '</span>' +
+            '</div>' +
+            '<button type="button" onclick="revertAutoSwap(' + idx + ')" class="shrink-0 ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-white dark:bg-slate-800 border border-amber-300 text-amber-800 dark:text-amber-300 hover:bg-amber-100">Revert</button>' +
+          '</div>';
+      }
+
       var dynamicPortionString = getDynamicPortionText(meal.day || weekDays[idx]);
 
       var recipeDetailsHtml = '';
@@ -1184,6 +1385,8 @@
           '</div>' +
           overrideBadge +
         '</div>' +
+
+        autoSwapAlertHtml +
 
         '<div class="space-y-1">' +
           '<div class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">🍳 ' + (active.gear || 'Stove / Skillet') + '</div>' +
