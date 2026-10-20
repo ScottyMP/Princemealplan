@@ -74,9 +74,9 @@
   <!-- Navigation Tabs -->
   <nav class="sticky top-[57px] z-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2">
     <div class="max-w-xl mx-auto grid grid-cols-4 gap-1.5">
-      <button type="button" onclick="switchTab('tab-groceries')" id="btn-groceries" class="tab-btn py-2 text-[11px] font-bold rounded-lg bg-red-600 text-white shadow-sm">1. Grocery List</button>
+      <button type="button" onclick="switchTab('tab-groceries')" id="btn-groceries" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">1. Grocery List</button>
       <button type="button" onclick="switchTab('tab-pantry')" id="btn-pantry" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">2. Pantry</button>
-      <button type="button" onclick="switchTab('tab-plan')" id="btn-plan" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">3. Dinners</button>
+      <button type="button" onclick="switchTab('tab-plan')" id="btn-plan" class="tab-btn py-2 text-[11px] font-bold rounded-lg bg-red-600 text-white shadow-sm">3. Dinners</button>
       <button type="button" onclick="switchTab('tab-family')" id="btn-family" class="tab-btn py-2 text-[11px] font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">4. Family</button>
     </div>
   </nav>
@@ -84,12 +84,12 @@
   <!-- Main Content Container -->
   <main class="max-w-xl mx-auto p-4 pb-24 space-y-4">
 
-    <!-- TAB 1: INTERACTIVE CATEGORIZED GROCERY & SHOPPING LIST -->
-    <section id="tab-groceries" class="space-y-4">
+    <!-- TAB 1: INTERACTIVE GROCERY LIST -->
+    <section id="tab-groceries" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Shopping List & Extras</h2>
-          <span class="text-[10px] text-slate-400">Auto-sorted by store department</span>
+          <span class="text-[10px] text-slate-400">Auto-sorted by department</span>
         </div>
 
         <div class="flex gap-2">
@@ -97,7 +97,6 @@
           <button type="button" onclick="addManualItem(false)" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
-        <!-- Quick Entry & Danielle's Request Button -->
         <div class="grid grid-cols-2 gap-2">
           <button type="button" onclick="promptDanielleRequest()" class="py-2 px-3 rounded-lg bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
             <span>💜</span> + Danielle's Request
@@ -117,11 +116,10 @@
         </div>
       </div>
 
-      <!-- Categorized In-Store Interactive Grocery List -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
           <div>
-            <h2 class="text-sm font-bold">In-Store Checklist (Tap to cross off)</h2>
+            <h2 class="text-sm font-bold">In-Store Checklist (Tap to check off)</h2>
             <p class="text-xs text-slate-500" id="itemCountLabel">0 items needed</p>
           </div>
           <button type="button" onclick="clearExtraItems()" class="text-xs text-red-600 dark:text-red-400 font-medium hover:underline">Clear Extras</button>
@@ -131,7 +129,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: PANTRY & STAPLES (WITH INSTANT SEARCH BAR) -->
+    <!-- TAB 2: PANTRY & STAPLES -->
     <section id="tab-pantry" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2.5">
         <div class="flex items-center justify-between">
@@ -168,7 +166,6 @@
         </div>
       </div>
 
-      <!-- Inventory Search & List -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
           <div>
@@ -180,7 +177,6 @@
           </button>
         </div>
 
-        <!-- Real-Time Search Bar -->
         <div class="relative">
           <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
           <input type="text" id="pantrySearchInput" oninput="handlePantrySearch(this.value)" placeholder="Search spices, meats, cheeses, freezer items..." class="w-full pl-8 pr-8 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -191,8 +187,8 @@
       </div>
     </section>
 
-    <!-- TAB 3: DINNERS (DAY-BY-DAY SLIDER) -->
-    <section id="tab-plan" class="hidden space-y-3">
+    <!-- TAB 3: DINNERS (SLIDER WITH PICTURE -> ITEMS NEEDED -> INSTRUCTIONS) -->
+    <section id="tab-plan" class="space-y-3">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
           <button type="button" onclick="changeDay(-1)" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1 active:scale-95">
@@ -212,8 +208,10 @@
         <div class="grid grid-cols-7 gap-1 pt-1" id="dayPillContainer"></div>
       </div>
 
+      <!-- Single Active Day Dinner Card -->
       <div id="dinnerCardsContainer" class="transition-all duration-200"></div>
 
+      <!-- Nutrient Audit -->
       <details class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm" open>
         <summary class="flex items-center justify-between text-xs font-bold cursor-pointer list-none select-none">
           <span class="uppercase tracking-wider text-slate-500 dark:text-slate-400">📊 9-Nutrient Dinner Audit (Tap to view fixes)</span>
@@ -280,7 +278,7 @@
 
   </main>
 
-  <!-- RECEIPT RECONCILE / RESTOCK MODAL -->
+  <!-- RECEIPT RESTOCK MODAL -->
   <div id="receiptRestockModal" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-3.5 shadow-2xl">
       <div class="flex items-center justify-between">
@@ -304,7 +302,7 @@
     </div>
   </div>
 
-  <!-- BULK IMPORT MODAL (PANTRY) -->
+  <!-- BULK IMPORT MODAL -->
   <div id="bulkImportModal" style="display: none;" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-sm w-full space-y-3.5 shadow-2xl">
       <div class="flex items-center justify-between">
@@ -587,7 +585,7 @@
     }
 
     /* ========================================================
-       TAB 1: AISLE-BY-AISLE INTERACTIVE GROCERY CHECKLIST
+       TAB 1: AISLE-BY-AISLE INTERACTIVE GROCERY LIST
        ======================================================== */
     function getFullGroceryList() {
       var list = [];
@@ -767,7 +765,7 @@
         return;
       }
 
-      if (!confirm('Restock ' + checkedItems.length + ' checked item(s) back to your Pantry? Unchecked items will stay on your list.')) return;
+      if (!confirm('Restock ' + checkedItems.length + ' checked item(s) back to your Pantry? Unchecked items stay on list.')) return;
 
       checkedItems.forEach(function(item) {
         if (item.source === 'pantry') {
@@ -778,7 +776,6 @@
         delete state.checkedGroceryMap[item.id];
       });
 
-      // Clear checked manual items
       state.manualGroceryItems = state.manualGroceryItems.filter(function(m, mIdx) {
         return !state.checkedGroceryMap['manual_' + mIdx];
       });
@@ -787,12 +784,9 @@
       renderGroceryList();
       renderPlan();
       syncToCloud();
-      alert('✓ Restocked ' + checkedItems.length + ' items to your Pantry! Remaining items are saved on your list.');
+      alert('✓ Restocked ' + checkedItems.length + ' items to your Pantry! Remaining items stay on list.');
     }
 
-    /* ========================================================
-       RECEIPT RECONCILE / RESTOCK MODAL & LOGIC
-       ======================================================== */
     function openReceiptRestockModal() {
       document.getElementById('receiptImportText').value = '';
       document.getElementById('receiptRestockModal').style.display = 'flex';
@@ -858,9 +852,6 @@
       alert(msg);
     }
 
-    /* ========================================================
-       GOOGLE KEEP CATEGORIZED EXPORT
-       ======================================================== */
     function shareToGoogleKeep() {
       var fullList = getFullGroceryList();
       if (!fullList.length) {
@@ -1050,9 +1041,8 @@
       state.plan.forEach(function(meal, mIdx) {
         if (!meal || meal.isOverridden) return;
 
-        var currentTitle = ((meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) 
-          ? meal.backups[meal.selectedBackupIndex].title 
-          : meal.standard.title).toLowerCase();
+        var currentOpt = getActiveRecipe(meal);
+        var currentTitle = (currentOpt.title || '').toLowerCase();
 
         var matches = false;
         if (query.indexOf('chicken') !== -1 && currentTitle.indexOf('chicken') !== -1) matches = true;
@@ -1064,31 +1054,27 @@
         if (query.indexOf('pizza') !== -1 && currentTitle.indexOf('pizza') !== -1) matches = true;
         if (currentTitle.indexOf(query) !== -1) matches = true;
 
-        if (matches) {
-          var foundBackup = false;
-          if (meal.backups && meal.backups.length) {
-            for (var b = 0; b < meal.backups.length; b++) {
-              if (meal.backups[b].title.toLowerCase().indexOf(query) === -1) {
-                meal.selectedBackupIndex = b;
-                meal.autoSwappedNote = 'Swapped from ' + meal.standard.title + ' (Missing ' + missingItemName + ')';
-                foundBackup = true;
-                break;
-              }
+        if (matches && meal.options && meal.options.length) {
+          // Cycle to first option whose title does not contain missing ingredient
+          var foundIndex = -1;
+          for (var o = 0; o < meal.options.length; o++) {
+            if (meal.options[o].title.toLowerCase().indexOf(query) === -1) {
+              foundIndex = o;
+              break;
             }
           }
-          if (!foundBackup) {
-            meal.selectedBackupIndex = null;
-            meal.effort = 'low';
-            meal.autoSwappedNote = 'Pivoted to Quick Alternative (Missing ' + missingItemName + ')';
+          if (foundIndex !== -1) {
+            meal.selectedOptionIndex = foundIndex;
+            meal.autoSwappedNote = 'Swapped to Option ' + (foundIndex + 1) + ' (Missing ' + missingItemName + ')';
+            swappedDays.push(meal.day || weekDays[mIdx]);
           }
-          swappedDays.push(meal.day || weekDays[mIdx]);
         }
       });
 
       renderGroceryList();
       if (swappedDays.length > 0) {
         renderPlan();
-        alert('Notice: ' + missingItemName + ' is LOW or OUT!\n\nDinners on ' + swappedDays.join(', ') + ' were automatically swapped to backup meals, and "' + missingItemName + '" was placed on Tab 1 (Grocery List).');
+        alert('Notice: ' + missingItemName + ' is LOW or OUT!\n\nDinners on ' + swappedDays.join(', ') + ' were automatically swapped to an in-stock option, and "' + missingItemName + '" was added to Tab 1.');
       }
     }
 
@@ -1161,7 +1147,7 @@
     /* ========================================================
        PORTIONS & HEADCOUNT
        ======================================================== */
-    function getDynamicPortionText(dayName) {
+    function getDynamicPortionText(dayName, optIdx) {
       var fam = state.family || { adults: 2, kids: 1, guests: 0 };
       var adults = fam.adults || 2;
       var kids = fam.kids || 0;
@@ -1169,52 +1155,7 @@
       var totalPeople = adults + kids + guests;
       var adultHeads = adults + guests;
 
-      var header = 'Scaled for ' + totalPeople + ' people (' + adults + ' Adults, ' + kids + ' Kids' + (guests > 0 ? ', ' + guests + ' Guests' : '') + '): ';
-
-      switch(dayName) {
-        case 'Monday':
-          var chickenCount = Math.ceil(adultHeads * 1 + kids * 0.5);
-          var baconCount = Math.ceil(adultHeads * 2 + kids * 1);
-          var bunCount = totalPeople;
-          var cucCount = Math.max(1, Math.ceil(totalPeople / 3));
-          return header + chickenCount + ' chicken breasts, ' + baconCount + ' bacon strips, ' + bunCount + ' brioche buns, ' + cucCount + ' cucumber(s).';
-
-        case 'Tuesday':
-          var kits = Math.max(1, Math.ceil(totalPeople / 4));
-          var meatLbs = ((adultHeads * 0.35) + (kids * 0.2)).toFixed(1);
-          var cheeseCups = (totalPeople * 0.5).toFixed(1);
-          return header + kits + ' Old El Paso Taco Kit(s), ~' + meatLbs + ' lbs meat, ' + cheeseCups + ' cups shredded cheddar, Mexican corn salad.';
-
-        case 'Wednesday':
-          var lasagnaDesc = totalPeople > 4 ? '1 full Kirkland Lasagna tray' : '1/2 to 2/3 Kirkland Lasagna tray';
-          var mozzaCount = totalPeople * 2;
-          return header + lasagnaDesc + ', ' + mozzaCount + ' air-fryer mozza sticks, fresh cucumber slices.';
-
-        case 'Thursday':
-          var boxesKD = Math.max(1, Math.ceil((adultHeads * 0.8 + kids * 0.5)));
-          var stripsBacon = adultHeads * 2 + kids * 1;
-          var mozzaSticks = totalPeople * 2;
-          return header + boxesKD + ' boxes Kraft Dinner, ' + stripsBacon + ' bacon strips, ' + mozzaSticks + ' mozza sticks, 1.5 cups fresh blueberries.';
-
-        case 'Friday':
-          var pizzaCount = Math.max(1, Math.ceil(totalPeople / 3));
-          return header + pizzaCount + ' Motor City Detroit Pizza(s) (' + (pizzaCount * 8) + ' square slices total), fresh fruit plate.';
-
-        case 'Saturday':
-          var eggRolls = Math.ceil(adultHeads * 2 + kids * 1);
-          var samosas = Math.ceil(adultHeads * 2 + kids * 1);
-          var ciabattaBuns = Math.ceil(totalPeople * 0.75);
-          return header + eggRolls + ' Minh egg rolls, ' + samosas + ' samosas, ' + ciabattaBuns + ' cheesy garlic ciabatta buns, cucumber rounds.';
-
-        case 'Sunday':
-          var pastaGrams = Math.round((adultHeads * 90) + (kids * 50));
-          var chickenBreastsSun = Math.ceil(adultHeads * 1 + kids * 0.5);
-          var cheeseGrated = (totalPeople * 0.35).toFixed(1);
-          return header + pastaGrams + 'g Garofalo Spaghettini, ' + chickenBreastsSun + ' pan-seared chicken breasts, ~' + cheeseGrated + ' cups melted Beemster, cucumber coins.';
-
-        default:
-          return header + 'Standard scaled family portions.';
-      }
+      return totalPeople + ' Portions (' + adults + ' Adults, ' + kids + ' Kids' + (guests > 0 ? ', ' + guests + ' Guests' : '') + ')';
     }
 
     function adjustHeadcount(type, delta) {
@@ -1246,23 +1187,686 @@
       }
     }
 
+    /* ========================================================
+       TAB 3: DINNERS (PICTURE -> ITEMS NEEDED -> INSTRUCTIONS)
+       ======================================================== */
     function getActiveRecipe(meal) {
       if (!meal) return {};
-      var base;
-      if (meal.selectedBackupIndex !== undefined && meal.selectedBackupIndex !== null && meal.backups && meal.backups[meal.selectedBackupIndex]) {
-        base = meal.backups[meal.selectedBackupIndex];
-      } else if (meal.effort === 'low' && meal.lowEffort) {
-        base = meal.lowEffort;
-      } else if (meal.standard) {
-        base = meal.standard;
+      if (meal.options && meal.options.length) {
+        var idx = (meal.selectedOptionIndex !== undefined && meal.selectedOptionIndex !== null) ? meal.selectedOptionIndex : 0;
+        return meal.options[idx] || meal.options[0];
+      }
+      return meal.standard || {};
+    }
+
+    function setMealOption(mealIdx, optionIndex) {
+      var meal = state.plan[mealIdx];
+      if (!meal) return;
+      delete meal.autoSwappedNote;
+      meal.selectedOptionIndex = parseInt(optionIndex);
+      renderPlan();
+      syncToCloud();
+    }
+
+    function toggleEffortMode(mealIdx) {
+      var meal = state.plan[mealIdx];
+      if (!meal) return;
+      delete meal.autoSwappedNote;
+      var cur = meal.selectedOptionIndex || 0;
+      // If in standard (0 or 1), switch to Quick A (2). If in Quick (2 or 3), switch to Standard Main (0).
+      if (cur === 0 || cur === 1) {
+        meal.selectedOptionIndex = 2;
       } else {
-        base = meal;
+        meal.selectedOptionIndex = 0;
+      }
+      renderPlan();
+      syncToCloud();
+    }
+
+    function revertAutoSwap(mealIdx) {
+      var meal = state.plan[mealIdx];
+      if (meal) {
+        meal.selectedOptionIndex = 0;
+        delete meal.autoSwappedNote;
+        renderPlan();
+        syncToCloud();
+      }
+    }
+
+    function renderPlan() {
+      renderDayPills();
+
+      var container = document.getElementById('dinnerCardsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!Array.isArray(state.plan) || !state.plan.length || !state.plan[0].options) {
+        generatePlan();
       }
 
-      if (meal.isOverridden && meal.overrideNutrients) {
-        return Object.assign({}, base, { nutrients: meal.overrideNutrients });
+      var idx = currentDayIndex;
+      var meal = state.plan[idx];
+      if (!meal) return;
+
+      var optIdx = meal.selectedOptionIndex || 0;
+      var active = getActiveRecipe(meal) || {};
+      var card = document.createElement('div');
+      card.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3.5';
+
+      var isQuickMode = optIdx >= 2;
+      var modeBadge = isQuickMode
+        ? '<button type="button" onclick="toggleEffortMode(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ Mode: 10-Min Quick</button>'
+        : '<button type="button" onclick="toggleEffortMode(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700">⚡ Mode: Standard Cook</button>';
+
+      var freshnessBadge = '';
+      if (active.freshness === 'high') {
+        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">🥗 Eat First</span>';
+      } else if (active.freshness === 'mid') {
+        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">🥒 Mid-Week</span>';
+      } else {
+        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">❄️ Freezer/Pantry</span>';
       }
-      return base;
+
+      // Auto-Swap Alert Banner
+      var autoSwapAlertHtml = '';
+      if (meal.autoSwappedNote) {
+        autoSwapAlertHtml = 
+          '<div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-xs">' +
+            '<div class="flex items-center gap-2 overflow-hidden">' +
+              '<span>🔄</span>' +
+              '<span class="font-bold text-amber-900 dark:text-amber-200 truncate">' + meal.autoSwappedNote + '</span>' +
+            '</div>' +
+            '<button type="button" onclick="revertAutoSwap(' + idx + ')" class="shrink-0 ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-white dark:bg-slate-800 border border-amber-300 text-amber-800 dark:text-amber-300 hover:bg-amber-100">Revert</button>' +
+          '</div>';
+      }
+
+      // 4-Option Selector Dropdown
+      var fourOptionsHtml = '';
+      if (meal.options && meal.options.length) {
+        fourOptionsHtml = meal.options.map(function(opt, oIdx) {
+          var sel = (oIdx === optIdx) ? 'selected' : '';
+          var icon = (oIdx === 0) ? '⚡ Option 1 (Main Standard): ' : ((oIdx === 1) ? '💡 Option 2 (Standard Backup): ' : ((oIdx === 2) ? '🛋️ Option 3 (10-Min Quick A): ' : '🛋️ Option 4 (10-Min Quick B Alternate): '));
+          return '<option value="' + oIdx + '" ' + sel + '>' + icon + opt.title + '</option>';
+        }).join('');
+      }
+
+      // 1. Picture Layout
+      var pictureHtml = 
+        '<div class="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800">' +
+          '<img src="' + (active.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80') + '" alt="' + active.title + '" class="w-full h-full object-cover">' +
+          '<div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-black/20 to-transparent flex items-end p-3">' +
+            '<div>' +
+              '<span class="text-[10px] uppercase font-black tracking-wider text-red-400 block mb-0.5">🍳 ' + (active.gear || 'Stove / Skillet') + ' • ' + (active.timing || '15 min') + '</span>' +
+              '<h3 class="text-white font-black text-base drop-shadow-md leading-tight">' + active.title + '</h3>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      // 2. List of items needed to cook meal
+      var itemsNeededLi = '';
+      if (active.itemsNeeded && active.itemsNeeded.length) {
+        itemsNeededLi = active.itemsNeeded.map(function(itemText) {
+          return '<li class="flex items-center gap-1.5"><span class="text-red-500 font-bold">•</span> <span>' + itemText + '</span></li>';
+        }).join('');
+      }
+
+      var itemsNeededBox = 
+        '<div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">' +
+              '<span>🛒</span> List of Items Needed to Cook:' +
+            '</span>' +
+            '<span class="text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">' + getDynamicPortionText(meal.day, optIdx) + '</span>' +
+          '</div>' +
+          '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium pl-1">' +
+            itemsNeededLi +
+          '</ul>' +
+        '</div>';
+
+      // 3. Step-by-Step Instructions
+      var stepsLi = '';
+      if (active.steps && active.steps.length) {
+        stepsLi = active.steps.map(function(s, sIdx) {
+          return '<li class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-black text-red-600 dark:text-red-400 mr-1">' + (sIdx + 1) + '.</span> ' + s + '</li>';
+        }).join('');
+      }
+
+      var instructionsBox = 
+        '<div class="space-y-2 pt-1">' +
+          '<div class="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">' +
+            '<span>👨‍🍳</span> Cooking Instructions:' +
+          '</div>' +
+          '<ol class="space-y-2 pl-1 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">' +
+            stepsLi +
+          '</ol>' +
+        '</div>';
+
+      // Nutrient Pills
+      var nutrientPills = '<div class="pt-1"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Dinner Nutrients:</span><div class="flex flex-wrap gap-1.5">';
+      standardNutrients.forEach(function(n) {
+        var isTagActive = active.nutrients && active.nutrients.indexOf(n) > -1;
+        var btnStyle = isTagActive
+          ? 'bg-blue-600 text-white font-bold shadow-sm'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium';
+        nutrientPills += '<button type="button" onclick="toggleMealNutrient(' + idx + ', \'' + n + '\')" class="px-2.5 py-1 text-[11px] rounded-lg transition-colors ' + btnStyle + '">' + (isTagActive ? '✓ ' : '+ ') + n + '</button>';
+      });
+      nutrientPills += '</div></div>';
+
+      card.innerHTML = 
+        '<div class="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">' +
+          '<div class="flex items-center gap-1.5">' +
+            freshnessBadge +
+            modeBadge +
+          '</div>' +
+          '<div class="text-[11px] font-bold text-slate-400">Day ' + (idx + 1) + ' of 7</div>' +
+        '</div>' +
+
+        autoSwapAlertHtml +
+
+        // 4-Option Selector Dropdown Box
+        '<div class="space-y-1">' +
+          '<label class="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Select From 4 Meal Options (Standard & 10-Min Quick):</label>' +
+          '<select onchange="setMealOption(' + idx + ', this.value)" class="w-full text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500">' +
+            fourOptionsHtml +
+          '</select>' +
+        '</div>' +
+
+        // Sequence: 1. Pictures -> 2. List of items needed -> 3. Instructions
+        pictureHtml +
+        itemsNeededBox +
+        instructionsBox +
+
+        nutrientPills +
+
+        '<div class="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 pt-2 border-t border-slate-100 dark:border-slate-800">' +
+          '<span>❄️ Thaw Alert:</span><span>' + (active.thaw || 'None needed.') + '</span>' +
+        '</div>';
+
+      container.appendChild(card);
+      renderNutrientScorecard();
+    }
+
+    function generatePlan() {
+      state.plan = [
+        {
+          day: 'Monday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Bacon & Grilled Chicken Brioche Melts',
+              image: 'https://images.unsplash.com/photo-1521305916504-4a1121188589?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet / Outdoor Grill',
+              freshness: 'high',
+              timing: 'Prep: 5 min | Cook: 15 min',
+              itemsNeeded: ['4 Maple Leaf Chicken Breasts', '6 Slices Thick Cut Bacon', '3-4 Brioche Buns', 'Havarti or Marble Cheddar Slices', 'Chipotle Aioli or Mayonnaise', '1 Long English Cucumber (sliced)'],
+              steps: [
+                'Crisp bacon strips in skillet over medium heat (6-7 min). Transfer to plate, reserving 1 tbsp drippings in pan.',
+                'Season chicken with Montreal Chicken Seasoning. Pan-sear in drippings over medium heat for 6-7 min per side until 165°F.',
+                'Melt Havarti or Marble Cheddar over hot chicken. Lightly toast brioche bun halves in pan.',
+                'Assemble melts with Chipotle Aioli and serve alongside crisp cucumber rounds.'
+              ],
+              thaw: 'Move chicken breasts from freezer to fridge.',
+              nutrients: ['Iron', 'Calcium', 'Zinc', 'Potassium']
+            },
+            {
+              title: 'Crispy Cheddar Quesadillas with Bacon',
+              image: 'https://images.unsplash.com/photo-1618040996337-56904b7850b9?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet (10 min)',
+              freshness: 'high',
+              timing: 'Prep: 2 min | Cook: 8 min',
+              itemsNeeded: ['4 Large Soft Tortillas', '6 Slices Cooked Bacon (crumbled)', '1.5 cups Shredded Marble Cheddar', 'Salsa & Sour Cream', 'Cucumber Coins'],
+              steps: [
+                'Lay tortillas flat in warm dry skillet, scatter generously with shredded cheddar and crispy bacon crumbles.',
+                'Fold tortilla in half. Toast 3 min per side until golden brown, crispy, and gooey inside.',
+                'Cut into triangles and serve immediately with salsa, sour cream, and fresh cucumber coins.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Iron']
+            },
+            {
+              title: '10-Min Air Fryer Bacon & Cheesy Brioche Melts',
+              image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (380°F) & Toaster',
+              freshness: 'high',
+              timing: 'Prep: 2 min | Cook: 8 min',
+              itemsNeeded: ['6 Slices Thick Cut Bacon', '3-4 Brioche Buns', 'Havarti or Cheddar Slices', 'Mayonnaise', 'Sliced Cucumbers'],
+              steps: [
+                'Air fry bacon strips at 380°F for 6 min until sizzling and crispy.',
+                'Toast brioche buns with slices of cheese until melted.',
+                'Layer bacon into cheesy warm brioche rolls and serve with cold cucumber slices.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Iron']
+            },
+            {
+              title: '10-Min Breakfast Sausage & Fried Egg Brioche Sandwiches',
+              image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet (10 min)',
+              freshness: 'high',
+              timing: 'Prep: 2 min | Cook: 8 min',
+              itemsNeeded: ['4-6 Breakfast Sausages', '3-4 Large Eggs', '3-4 Brioche Buns', 'Marble Cheddar', 'Ketchup or Chipotle Aioli'],
+              steps: [
+                'Brown breakfast sausages in skillet for 5 min until hot and glistening; set aside.',
+                'Crack eggs into pan and fry to desired doneness (sunny or over-easy), topping with cheddar to melt.',
+                'Tuck sausage and cheesy eggs into toasted brioche buns with ketchup or aioli.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Iron', 'Vit D', 'Calcium', 'Zinc']
+            }
+          ]
+        },
+        {
+          day: 'Tuesday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Old El Paso Family Taco Night',
+              image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet & Oven',
+              freshness: 'high',
+              timing: 'Prep: 5 min | Cook: 10 min',
+              itemsNeeded: ['1 Old El Paso Stand N Stuff Taco Kit', '1-1.5 lbs Ground Meat / Turkey', 'Taco Seasoning Packet', 'Shredded Marble Cheddar', 'Mexican Street Corn Salad Kit', 'Sour Cream & Salsa'],
+              steps: [
+                'Brown meat in skillet over medium-high heat (8 min). Stir in taco seasoning and 1/3 cup water; simmer 3 min.',
+                'Warm taco shells and tortillas in oven at 325°F for 3 min.',
+                'Assemble tacos with meat, shredded cheddar, and sour cream; serve with mixed Mexican corn salad.'
+              ],
+              thaw: 'None needed.',
+              nutrients: ['Iron', 'Calcium', 'Fiber', 'Zinc', 'Potassium']
+            },
+            {
+              title: 'Cuisine Adventures Mini Quiches & Fresh Sliced Fruit',
+              image: 'https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (375°F)',
+              freshness: 'high',
+              timing: 'Prep: 1 min | Cook: 11 min',
+              itemsNeeded: ['10-12 Cuisine Adventures Mini Quiches', 'Kirkland Wild Blueberries', 'Bananas (sliced)', 'Cheestrings'],
+              steps: [
+                'Place frozen mini quiches in air fryer at 375°F for 10-12 min until puffed and golden brown.',
+                'Plate with a side of cold fresh blueberries, sliced banana coins, and Cheestrings.'
+              ],
+              thaw: 'None (cook straight from freezer).',
+              nutrients: ['Vit D', 'Calcium', 'Iron', 'Zinc']
+            },
+            {
+              title: '10-Min Cheesy Taco Nacho Sheet Pan',
+              image: 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=700&q=80',
+              gear: 'Sheet Pan / Oven (375°F)',
+              freshness: 'high',
+              timing: 'Prep: 2 min | Cook: 8 min',
+              itemsNeeded: ['Tortilla Chips or Broken Taco Shells', 'Pre-Cooked Meat or Beans', '1.5 cups Shredded Cheddar', 'Sour Cream & Salsa', 'Mexican Street Corn Salad'],
+              steps: [
+                'Scatter chips on sheet pan, scatter cooked taco meat/beans and generous cheddar.',
+                'Bake at 375°F for 7-8 min until cheese is melted and bubbling.',
+                'Serve immediately family-style with bowls of salsa and sour cream.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Iron', 'Potassium']
+            },
+            {
+              title: '10-Min Crispy Feta & Refried Bean Soft Tacos',
+              image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet (10 min)',
+              freshness: 'high',
+              timing: 'Prep: 2 min | Cook: 8 min',
+              itemsNeeded: ['4-6 Soft Taco Tortillas', '1 Can Refried Beans or Black Beans', 'Crumbled Tre Stelle Feta Cheese', 'Salsa', 'Cucumber Slices'],
+              steps: [
+                'Warm beans in skillet with a pinch of cumin and chili powder.',
+                'Spoon warm seasoned beans into soft tortillas, top with salty crumbled feta and salsa.',
+                'Serve alongside crunchy cucumber spears.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Fiber', 'Calcium', 'Iron']
+            }
+          ]
+        },
+        {
+          day: 'Wednesday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Kirkland Signature Italian Sausage & Beef Lasagna',
+              image: 'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?auto=format&fit=crop&w=700&q=80',
+              gear: 'Oven (375°F) & Air Fryer',
+              freshness: 'mid',
+              timing: 'Prep: 2 min | Cook: 55 min',
+              itemsNeeded: ['1 Kirkland Italian Sausage & Beef Lasagna Tray', '6-8 Mozzarella Sticks', '1 Long English Cucumber (cut into spears)', 'Pilaros Greek Olives'],
+              steps: [
+                'Bake lasagna tray at 375°F covered with foil for 45 min, uncover for final 10 min until bubbling and golden.',
+                'Air fry mozzarella sticks at 390°F for 5-6 min until crispy and hot.',
+                'Rest lasagna 5 min, portion into squares, and serve with mozza sticks and olives.'
+              ],
+              thaw: 'Move lasagna to fridge morning of.',
+              nutrients: ['Iron', 'Calcium', 'Vit C', 'Potassium']
+            },
+            {
+              title: 'Olivieri Butternut Squash & Mascarpone Ravioli',
+              image: 'https://images.unsplash.com/photo-1587740908075-9e245070dfaa?auto=format&fit=crop&w=700&q=80',
+              gear: 'Stove Pot (8 min)',
+              freshness: 'mid',
+              timing: 'Prep: 1 min | Cook: 7 min',
+              itemsNeeded: ['1 Pack Olivieri Butternut Squash Ravioli', '2 tbsp Butter', 'Grated Beemster or Cheddar', 'Cracked Black Pepper', 'Cucumber Coins'],
+              steps: [
+                'Gently boil ravioli in salted water for 6-7 min until floating and tender; drain.',
+                'Toss hot ravioli with melted butter, cracked black pepper, and finely grated cheese.',
+                'Plate with cucumber coins for a velvety, kid-friendly dinner.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Potassium', 'Fiber']
+            },
+            {
+              title: '10-Min Air Fryer Mozza Sticks & Cheesy Pasta Plate',
+              image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (390°F) & Pot',
+              freshness: 'mid',
+              timing: 'Prep: 2 min | Cook: 8 min',
+              itemsNeeded: ['6-8 Mozzarella Sticks', 'Primo Capellini or Spaghettini', 'Butter & Shredded Cheese', 'Cucumber Rounds'],
+              steps: [
+                'Drop quick thin capellini into boiling water for 3-4 min.',
+                'Air fry mozzarella sticks at 390°F for 5-6 min.',
+                'Drain pasta, toss with butter and cheese, and serve with hot mozza sticks.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Vit C']
+            },
+            {
+              title: '10-Min Roman Meat Lasagna Individual Bake',
+              image: 'https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=700&q=80',
+              gear: 'Microwave / Quick Oven',
+              freshness: 'mid',
+              timing: 'Prep: 1 min | Cook: 9 min',
+              itemsNeeded: ['1 Roman Meat Lasagna Tray', 'Cheddar Cubes', 'Sliced Cucumber spears'],
+              steps: [
+                'Cook single Roman meat lasagna tray in microwave for 8-9 min per box instructions.',
+                'Let rest 2 min to set sauce.',
+                'Serve hot with cucumber spears and cheddar cubes on the side.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Iron', 'Calcium']
+            }
+          ]
+        },
+        {
+          day: 'Thursday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Elevated Kraft Dinner with Crispy Mozza Sticks & Bacon',
+              image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=700&q=80',
+              gear: 'Stove Pot & Air Fryer',
+              freshness: 'mid',
+              timing: 'Prep: 2 min | Cook: 12 min',
+              itemsNeeded: ['2 Boxes Kraft Dinner', '6 Slices Thick Cut Bacon', '6 Mozzarella Sticks', 'Homo Milk & Butter', 'Kirkland Wild Blueberries'],
+              steps: [
+                'Boil macaroni 7 min; drain well. Stir in butter, milk, cheese powder, and an extra handful of real marble cheddar.',
+                'Air fry bacon and mozzarella sticks at 390°F for 6 min until crispy and golden.',
+                'Chop bacon over creamy mac & cheese, serve with mozza sticks and fresh blueberries.'
+              ],
+              thaw: 'None needed.',
+              nutrients: ['Calcium', 'Vit C', 'Fiber']
+            },
+            {
+              title: 'Cheesy Bacon Macaroni & Sliced Apples',
+              image: 'https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&w=700&q=80',
+              gear: 'Stove Pot (12 min)',
+              freshness: 'mid',
+              timing: 'Prep: 2 min | Cook: 10 min',
+              itemsNeeded: ['2 Boxes KD', 'Bacon Crumbles', '1/2 cup Milk', 'Applesnax Apple Sauce / Fresh Fruit'],
+              steps: [
+                'Boil macaroni and prepare cheese sauce with milk and butter.',
+                'Fold in crispy bacon crumbles and extra shredded cheddar until silky.',
+                'Serve with chilled applesauce pouches or apple slices.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Iron', 'Fiber']
+            },
+            {
+              title: '10-Min Simple KD & Cheestrings Bowl',
+              image: 'https://images.unsplash.com/photo-1516100882582-96c3a05fe590?auto=format&fit=crop&w=700&q=80',
+              gear: 'Stove Pot (8 min)',
+              freshness: 'mid',
+              timing: 'Prep: 1 min | Cook: 8 min',
+              itemsNeeded: ['2 Boxes KD', 'Milk & Butter', 'Black Diamond Cheestrings', 'Blueberries'],
+              steps: [
+                'Boil macaroni 7 min, drain and stir in butter, milk, and cheese pack.',
+                'Peel Cheestrings into kid-friendly strips.',
+                'Serve warm creamy KD with Cheestrings and a bowl of sweet blueberries.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium']
+            },
+            {
+              title: '10-Min Classic Grilled Cheese on POM Bread with Cucumbers',
+              image: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet (8 min)',
+              freshness: 'mid',
+              timing: 'Prep: 2 min | Cook: 6 min',
+              itemsNeeded: ['6 Slices POM White Bread', 'Marble Cheddar or Havarti Slices', 'Butter', 'Cucumber Rounds'],
+              steps: [
+                'Butter outside of POM bread slices, fill with thick cheddar and Havarti slices.',
+                'Grill in skillet over medium heat for 3 min per side until bread is golden and cheese is molten.',
+                'Cut into triangles and serve with cold crunchy cucumber rounds.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Protein']
+            }
+          ]
+        },
+        {
+          day: 'Friday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Motor City Detroit-Style Deep Dish Pizza Night',
+              image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=700&q=80',
+              gear: 'Oven (425°F)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 19 min',
+              itemsNeeded: ['1-2 Motor City Detroit Double Pepperoni Pizzas', 'Kirkland Wild Blueberries', 'Sliced Cucumbers'],
+              steps: [
+                'Preheat oven to 425°F. Place pizza in included pan directly on center rack.',
+                'Bake 18-21 min until edges are deep caramelised golden and cheese bubbles.',
+                'Rest 3 min, slice into thick square cuts, and serve with cucumber slices and blueberries.'
+              ],
+              thaw: 'None (cook straight from freezer).',
+              nutrients: ['Calcium', 'Iron', 'Fiber']
+            },
+            {
+              title: 'French Bread Pizzas on POM White Bread',
+              image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=700&q=80',
+              gear: 'Toaster Oven / Broiler (8 min)',
+              freshness: 'low',
+              timing: 'Prep: 3 min | Cook: 6 min',
+              itemsNeeded: ['6 Slices POM White Bread', 'Rao\'s Marinara Sauce', 'Shredded Cheddar / Havarti', 'Pepperoni or Bacon crumbles'],
+              steps: [
+                'Spread marinara over slices of POM bread, top with cheese and bacon or pepperoni.',
+                'Toast under oven broiler for 5-6 min until cheese is bubbling and edges are crisp.',
+                'Serve with chilled fruit.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Iron']
+            },
+            {
+              title: '10-Min Motor City Detroit Pizza Slices',
+              image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=700&q=80',
+              gear: 'Oven (425°F)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 18 min',
+              itemsNeeded: ['1 Motor City Detroit Pizza', 'Fresh Fruit'],
+              steps: [
+                'Bake pizza 18 min in included pan.',
+                'Slide out, cut into quick squares and serve with fruit.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Iron']
+            },
+            {
+              title: '10-Min Air Fryer Mozza Sticks & Pizza Dippers',
+              image: 'https://images.unsplash.com/photo-1548340748-6d2b7d7da41b?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (390°F)',
+              freshness: 'low',
+              timing: 'Prep: 2 min | Cook: 7 min',
+              itemsNeeded: ['8 Mozzarella Sticks', 'Warm Rao\'s Marinara Sauce (for dipping)', 'Toasted Brioche Bun Halves', 'Cucumber Coins'],
+              steps: [
+                'Air fry mozzarella sticks at 390°F for 6 min.',
+                'Warm a small bowl of Rao\'s marinara sauce in microwave for 30 sec.',
+                'Serve crispy mozza sticks and toasted garlic bread with warm marinara dip.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Vit C']
+            }
+          ]
+        },
+        {
+          day: 'Saturday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Minh Egg Rolls & Chicken Samosas with Cheesy Garlic Ciabatta',
+              image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (375°F) & Toaster',
+              freshness: 'low',
+              timing: 'Prep: 5 min | Cook: 14 min',
+              itemsNeeded: ['4-6 Minh Pork Egg Rolls', '4-6 Chicken Samosas', '2 Ciabatta Buns', 'Butter & Garlic Powder', 'Marble Cheddar', 'Cucumber Rounds'],
+              steps: [
+                'Place egg rolls and samosas in air fryer at 375°F for 12-14 min, shaking halfway.',
+                'Slice ciabatta buns, spread butter, garlic powder, and cheese; toast until bubbling.',
+                'Slice fresh cucumber rounds and serve with sweet dipping sauces.'
+              ],
+              thaw: 'None (air fry straight from freezer).',
+              nutrients: ['Fiber', 'Calcium', 'Vit C', 'Potassium']
+            },
+            {
+              title: 'Mr. Donair Donair Dunkers with Warm Sweet Dip',
+              image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (375°F / 10 min)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 10 min',
+              itemsNeeded: ['1 Box Mr. Donair Donair Dunkers', 'Included Sweet Sauce', 'Sliced Cucumbers', 'Cheestrings'],
+              steps: [
+                'Air fry Donair Dunkers at 375°F for 9-11 min until crispy and hot.',
+                'Warm sweet donair dipping sauce packet in warm water.',
+                'Serve crispy dunkers with sauce, cold cucumber rounds, and Cheestrings.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Iron', 'Zinc', 'Calcium']
+            },
+            {
+              title: '10-Min Air Fryer Samosas & Cheesy Toast',
+              image: 'https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (375°F)',
+              freshness: 'low',
+              timing: 'Prep: 2 min | Cook: 10 min',
+              itemsNeeded: ['6 Chicken Samosas', 'POM Bread or Ciabatta', 'Cheddar Slices', 'Cucumber Rounds'],
+              steps: [
+                'Air fry samosas at 375°F for 10 min.',
+                'Toast bread with cheddar cheese.',
+                'Serve crispy samosas with cheesy toast and cucumbers.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Fiber', 'Calcium']
+            },
+            {
+              title: '10-Min Donair Dunkers & Crispy Egg Rolls Combo Plate',
+              image: 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=700&q=80',
+              gear: 'Air Fryer (380°F)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 9 min',
+              itemsNeeded: ['Donair Dunkers', 'Minh Egg Rolls', 'Plum Sauce or Sweet Dip', 'Cucumber Slices'],
+              steps: [
+                'Load air fryer basket with Donair Dunkers and Minh Egg Rolls.',
+                'Air fry at 380°F for 9-10 min until sizzling and golden brown.',
+                'Serve with dipping sauces and cucumber coins.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Iron', 'Fiber']
+            }
+          ]
+        },
+        {
+          day: 'Sunday',
+          selectedOptionIndex: 0,
+          options: [
+            {
+              title: 'Garofalo Spaghettini with Pan-Seared Chicken & Melted Beemster',
+              image: 'https://images.unsplash.com/photo-1621996346565-e3d5d6281699?auto=format&fit=crop&w=700&q=80',
+              gear: 'Pasta Pot & Skillet',
+              freshness: 'low',
+              timing: 'Prep: 5 min | Cook: 15 min',
+              itemsNeeded: ['250g Garofalo Spaghettini', '3 Maple Leaf Chicken Breasts', 'Grated Beemster Cheese', 'Butter & Olive Oil', 'Salt & Montreal Chicken Spice', 'Cucumber Coins'],
+              steps: [
+                'Boil spaghettini in salted water for 8 min. Reserve 1/4 cup pasta water; drain and toss with butter.',
+                'Season chicken with Montreal Chicken Seasoning. Pan-sear in butter/oil over medium heat 6-7 min per side until 165°F.',
+                'Toss warm pasta with reserved pasta water and finely grated Beemster cheese until silky.',
+                'Slice chicken over pasta and serve with crisp cucumber coins.'
+              ],
+              thaw: 'Move chicken breasts to fridge.',
+              nutrients: ['Iron', 'Calcium', 'Zinc', 'Magnesium']
+            },
+            {
+              title: 'Pan-Seared Basa Fillets with Garlic Butter Rice',
+              image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=700&q=80',
+              gear: 'Skillet (12 min)',
+              freshness: 'low',
+              timing: 'Prep: 2 min | Cook: 10 min',
+              itemsNeeded: ['3-4 Basa Fillets (thawed)', '2 tbsp Butter & Garlic Powder', 'Jasmine Rice', 'Cracked Pepper & Salt', 'Cucumber Rounds'],
+              steps: [
+                'Season Basa fillets with salt, pepper, and garlic powder.',
+                'Melt butter in skillet over medium heat. Pan-sear fillets 4 min per side until flaky and opaque.',
+                'Serve flaky fillets alongside warm buttered jasmine rice and cucumber rounds.'
+              ],
+              thaw: 'Move basa fillets to fridge morning of.',
+              nutrients: ['Iron', 'Vit D', 'Omega-3']
+            },
+            {
+              title: '10-Min Buttered Beemster Cheesy Noodles',
+              image: 'https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&w=700&q=80',
+              gear: 'Stove Pot (8 min)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 7 min',
+              itemsNeeded: ['Primo Capellini or Spaghettini', '3 tbsp Butter', 'Finely Grated Beemster Cheese', 'Cucumber Coins'],
+              steps: [
+                'Boil quick thin noodles in salted water for 5-6 min until tender; drain.',
+                'Melt in generous butter and stir in grated aged Beemster until creamy.',
+                'Serve warm with crisp cucumber coins.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Calcium', 'Protein']
+            },
+            {
+              title: '10-Min Capellini with Rao\'s Marinara & Shredded Cheese',
+              image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=700&q=80',
+              gear: 'Stove Pot (8 min)',
+              freshness: 'low',
+              timing: 'Prep: 1 min | Cook: 7 min',
+              itemsNeeded: ['Primo Capellini Pasta', '1 Cup Rao\'s Homemade Marinara Sauce', 'Shredded Marble Cheddar or Feta', 'Cucumber Slices'],
+              steps: [
+                'Boil capellini pasta for 4 min; drain.',
+                'Toss warm pasta with Rao\'s rich marinara sauce and top with shredded cheese.',
+                'Serve with cold cucumber slices.'
+              ],
+              thaw: 'None.',
+              nutrients: ['Vit C', 'Calcium', 'Fiber']
+            }
+          ]
+        }
+      ];
+      renderPlan();
+    }
+
+    function toggleMealNutrient(mealIdx, nutr) {
+      var meal = state.plan[mealIdx];
+      if (!meal) return;
+      var r = getActiveRecipe(meal);
+      if (!r.nutrients) r.nutrients = [];
+      var pos = r.nutrients.indexOf(nutr);
+      if (pos > -1) {
+        r.nutrients.splice(pos, 1);
+      } else {
+        r.nutrients.push(nutr);
+      }
+      renderPlan();
+      syncToCloud();
     }
 
     function selectNutrientDetail(nutr) {
@@ -1341,100 +1945,21 @@
       }
     }
 
-    function toggleMealNutrient(mealIdx, nutr) {
-      var meal = state.plan[mealIdx];
+    function tagBoosterToToday(nutr) {
+      var meal = state.plan[currentDayIndex];
       if (!meal) return;
       var r = getActiveRecipe(meal);
-      var currentList = (r && r.nutrients) ? r.nutrients.slice() : [];
-      var pos = currentList.indexOf(nutr);
-      if (pos > -1) {
-        currentList.splice(pos, 1);
-      } else {
-        currentList.push(nutr);
-      }
-
-      if (meal.isOverridden) {
-        meal.overrideNutrients = currentList;
-      } else {
-        r.nutrients = currentList;
-      }
-
-      renderPlan();
-      syncToCloud();
-    }
-
-    function toggleMealOverride(mealIdx) {
-      var meal = state.plan[mealIdx];
-      meal.isOverridden = !meal.isOverridden;
-      if (!meal.isOverridden) {
-        meal.actualMade = '';
-        delete meal.overrideNutrients;
+      if (!r.nutrients) r.nutrients = [];
+      if (r.nutrients.indexOf(nutr) === -1) {
+        r.nutrients.push(nutr);
       }
       renderPlan();
       syncToCloud();
     }
 
-    function updateActualMealText(mealIdx, val) {
-      if (state.plan && state.plan[mealIdx]) {
-        state.plan[mealIdx].actualMade = val;
-      }
-    }
-
-    function saveCustomMealText(mealIdx) {
-      var meal = state.plan[mealIdx];
-      if (!meal) return;
-      var text = meal.actualMade || '';
-      var detected = autoDetectNutrients(text);
-      if (detected.length > 0) {
-        meal.overrideNutrients = detected;
-      }
-      renderPlan();
-      syncToCloud();
-    }
-
-    function toggleEffort(mealIdx) {
-      var meal = state.plan[mealIdx];
-      meal.selectedBackupIndex = null;
-      delete meal.autoSwappedNote;
-      meal.effort = meal.effort === 'standard' ? 'low' : 'standard';
-      renderPlan();
-      syncToCloud();
-    }
-
-    function selectBackupMeal(mealIdx, backupIdx) {
-      var meal = state.plan[mealIdx];
-      delete meal.autoSwappedNote;
-      if (backupIdx === "" || backupIdx === null) {
-        meal.selectedBackupIndex = null;
-      } else {
-        meal.selectedBackupIndex = parseInt(backupIdx);
-      }
-      renderPlan();
-      syncToCloud();
-    }
-
-    function revertAutoSwap(mealIdx) {
-      var meal = state.plan[mealIdx];
-      if (meal) {
-        meal.selectedBackupIndex = null;
-        meal.effort = 'standard';
-        delete meal.autoSwappedNote;
-        renderPlan();
-        syncToCloud();
-      }
-    }
-
-    function swapMeals(idxA, idxB) {
-      if (idxA === idxB || idxB < 0 || idxB >= state.plan.length) return;
-      var tempMeal = Object.assign({}, state.plan[idxA]);
-      
-      state.plan[idxA] = Object.assign({}, state.plan[idxB]);
-      state.plan[idxA].day = weekDays[idxA];
-
-      state.plan[idxB] = tempMeal;
-      state.plan[idxB].day = weekDays[idxB];
-
-      renderPlan();
+    function quickAdd(name, cat) {
+      state.manualGroceryItems.push({ name: name, cat: cat || autoCategorizePantryItem(name) });
+      renderGroceryList();
       syncToCloud();
     }
 
@@ -1494,156 +2019,6 @@
       if (dayLabel) dayLabel.textContent = weekDays[currentDayIndex];
     }
 
-    function renderPlan() {
-      renderDayPills();
-
-      var container = document.getElementById('dinnerCardsContainer');
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (!Array.isArray(state.plan) || !state.plan.length) {
-        generatePlan();
-      }
-
-      var idx = currentDayIndex;
-      var meal = state.plan[idx];
-      if (!meal) return;
-
-      var active = getActiveRecipe(meal) || {};
-      var card = document.createElement('div');
-      card.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3.5';
-
-      var overrideBadge = meal.isOverridden 
-        ? '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700">↩️ Revert to Planned Meal</button>'
-        : '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">✏️ Log Custom Meal</button>';
-
-      var overrideInput = '';
-      if (meal.isOverridden) {
-        overrideInput = '<div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 space-y-1.5">' +
-          '<label class="block text-[11px] font-bold text-amber-900 dark:text-amber-300 uppercase">What did you make instead? (Auto-tags nutrients)</label>' +
-          '<input type="text" value="' + (meal.actualMade || '') + '" oninput="updateActualMealText(' + idx + ', this.value)" onblur="saveCustomMealText(' + idx + ')" onkeydown="if(event.key===\'Enter\'){this.blur();}" placeholder="e.g. Steak and salad, scrambled eggs, takeout..." class="w-full px-3 py-2 text-xs rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">' +
-        '</div>';
-      }
-
-      var autoSwapAlertHtml = '';
-      if (meal.autoSwappedNote) {
-        autoSwapAlertHtml = 
-          '<div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 text-xs">' +
-            '<div class="flex items-center gap-2 overflow-hidden">' +
-              '<span>🔄</span>' +
-              '<span class="font-bold text-amber-900 dark:text-amber-200 truncate">' + meal.autoSwappedNote + '</span>' +
-            '</div>' +
-            '<button type="button" onclick="revertAutoSwap(' + idx + ')" class="shrink-0 ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-white dark:bg-slate-800 border border-amber-300 text-amber-800 dark:text-amber-300 hover:bg-amber-100">Revert</button>' +
-          '</div>';
-      }
-
-      var dynamicPortionString = getDynamicPortionText(meal.day || weekDays[idx]);
-
-      var recipeDetailsHtml = '';
-      if (active.steps && Array.isArray(active.steps) && active.steps.length) {
-        var stepsLi = active.steps.map(function(s, stepIdx) {
-          return '<li class="text-xs text-slate-600 dark:text-slate-300"><span class="font-bold text-slate-800 dark:text-slate-200">' + (stepIdx + 1) + '.</span> ' + s + '</li>';
-        }).join('');
-
-        recipeDetailsHtml = 
-          '<details class="group border border-slate-200 dark:border-slate-800 rounded-xl p-3 bg-slate-50/70 dark:bg-slate-800/40">' +
-            '<summary class="text-xs font-bold text-red-600 dark:text-red-400 cursor-pointer flex items-center justify-between list-none">' +
-              '<span>👨‍🍳 View Recipe Steps & Exact Scaled Portions</span>' +
-              '<span class="text-[10px] text-slate-400 group-open:rotate-180 transition-transform">▼</span>' +
-            '</summary>' +
-            '<div class="pt-3 space-y-2 border-t border-slate-200 dark:border-slate-700 mt-2.5">' +
-              '<div class="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px]">' +
-                '<span class="font-bold text-slate-700 dark:text-slate-300 block mb-0.5">⚖️ Dynamic Headcount Portions:</span>' +
-                '<span class="text-slate-600 dark:text-slate-400">' + dynamicPortionString + '</span>' +
-              '</div>' +
-              '<div class="text-[11px] font-semibold text-slate-500">⏱️ ' + (active.timing || '15 min') + '</div>' +
-              '<ol class="space-y-1.5 pl-1">' + stepsLi + '</ol>' +
-            '</div>' +
-          '</details>';
-      }
-
-      var nutrientPills = '<div class="pt-1"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Dinner Nutrients (Auto-tagged or tap to toggle):</span><div class="flex flex-wrap gap-1.5">';
-      standardNutrients.forEach(function(n) {
-        var isTagActive = active.nutrients && active.nutrients.indexOf(n) > -1;
-        var btnStyle = isTagActive
-          ? 'bg-blue-600 text-white font-bold shadow-sm'
-          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium';
-        nutrientPills += '<button type="button" onclick="toggleMealNutrient(' + idx + ', \'' + n + '\')" class="px-2.5 py-1 text-[11px] rounded-lg transition-colors ' + btnStyle + '">' + (isTagActive ? '✓ ' : '+ ') + n + '</button>';
-      });
-      nutrientPills += '</div></div>';
-
-      var swapOptions = weekDays.map(function(dName, dIdx) {
-        if (dIdx === idx) return '';
-        return '<option value="' + dIdx + '">Move to ' + dName + '</option>';
-      }).join('');
-
-      var backupOptions = '';
-      if (meal.backups && meal.backups.length) {
-        backupOptions = meal.backups.map(function(b, bIdx) {
-          var isSel = meal.selectedBackupIndex === bIdx ? 'selected' : '';
-          return '<option value="' + bIdx + '" ' + isSel + '>💡 ' + b.title + '</option>';
-        }).join('');
-      }
-
-      var freshnessBadge = '';
-      if (active.freshness === 'high') {
-        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">🥗 Eat First</span>';
-      } else if (active.freshness === 'mid') {
-        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">🥒 Mid-Week</span>';
-      } else {
-        freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">❄️ Freezer/Pantry</span>';
-      }
-
-      var energyBtn = meal.effort === 'low'
-        ? '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ Mode: 10-Min Quick</button>'
-        : '<button type="button" onclick="toggleEffort(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700">⚡ Mode: Standard Cook</button>';
-
-      card.innerHTML = 
-        '<div class="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">' +
-          '<div class="flex items-center gap-1.5">' +
-            freshnessBadge +
-            energyBtn +
-          '</div>' +
-          overrideBadge +
-        '</div>' +
-
-        autoSwapAlertHtml +
-
-        '<div class="space-y-1">' +
-          '<div class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">🍳 ' + (active.gear || 'Stove / Skillet') + '</div>' +
-          '<h3 class="text-base font-extrabold ' + (meal.isOverridden ? 'line-through text-slate-400' : 'text-slate-900 dark:text-slate-100') + '">' + (active.title || 'Dinner') + '</h3>' +
-        '</div>' +
-
-        overrideInput +
-
-        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">' +
-          (meal.backups && meal.backups.length ? 
-            '<div>' +
-              '<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Quick Alternate Choice:</label>' +
-              '<select onchange="selectBackupMeal(' + idx + ', this.value)" class="w-full text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-700 dark:text-slate-200">' +
-                '<option value="">💡 Keep Default Recipe</option>' + backupOptions +
-              '</select>' +
-            '</div>' : '') +
-          '<div>' +
-            '<label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Reorganize Schedule:</label>' +
-            '<select onchange="swapMeals(' + idx + ', parseInt(this.value))" class="w-full text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-700 dark:text-slate-200">' +
-              '<option value="" selected disabled>⇄ Move to another day...</option>' + swapOptions +
-            '</select>' +
-          '</div>' +
-        '</div>' +
-
-        recipeDetailsHtml +
-
-        nutrientPills +
-
-        '<div class="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 pt-2 border-t border-slate-100 dark:border-slate-800">' +
-          '<span>❄️ Thaw Alert:</span><span>' + (active.thaw || 'None needed.') + '</span>' +
-        '</div>';
-
-      container.appendChild(card);
-      renderNutrientScorecard();
-    }
-
     var touchStartX = 0;
     var touchEndX = 0;
     function setupSwipeGestures() {
@@ -1662,282 +2037,6 @@
     function handleSwipe() {
       if (touchEndX < touchStartX - 50) changeDay(1);
       if (touchEndX > touchStartX + 50) changeDay(-1);
-    }
-
-    function generatePlan() {
-      state.plan = [
-        { 
-          day: 'Monday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Bacon & Grilled Chicken Brioche Melts', 
-            gear: 'Cast-Iron Skillet / Outdoor Grill', 
-            freshness: 'high',
-            timing: 'Prep: 5 min | Cook: 15 min',
-            steps: [
-              'Cook bacon strips in skillet over medium heat until crispy (6-7 min). Transfer to plate, leave 1 tbsp drippings in pan.',
-              'Season chicken with Montreal Chicken Seasoning or garlic powder. Cook in skillet over medium heat for 6-7 min per side until 165°F.',
-              'Top chicken with Havarti or Marble Cheddar to melt. Toast brioche bun halves in pan for 1 min.',
-              'Plating: Assemble melts with Chipotle Aioli or mayo and serve with fresh sliced cucumbers.'
-            ],
-            thaw: 'Move chicken breasts from freezer to fridge.',
-            nutrients: ['Iron', 'Calcium', 'Zinc', 'Potassium']
-          },
-          lowEffort: {
-            title: '12-Minute Air Fryer Bacon & Cheesy Brioche Melts',
-            gear: 'Air Fryer (375°F) & Skillet',
-            freshness: 'high',
-            timing: 'Prep: 2 min | Cook: 10 min',
-            steps: [
-              'Air fry bacon strips at 380°F for 6 min until crispy.',
-              'Toast brioche buns with cheddar/Havarti until melted.',
-              'Assemble warm cheesy bacon melts; slice cucumber rounds.'
-            ],
-            thaw: 'None needed.',
-            nutrients: ['Calcium', 'Iron']
-          },
-          backups: [
-            {
-              title: 'Crispy Cheddar Quesadillas with Bacon',
-              gear: 'Skillet (10 min)',
-              freshness: 'high',
-              timing: 'Prep: 2 min | Cook: 8 min',
-              steps: ['Crisp bacon in pan.', 'Fold shredded cheddar and bacon into tortillas; toast in pan 3 min per side until gooey.'],
-              nutrients: ['Calcium', 'Iron'],
-              thaw: 'None.'
-            }
-          ],
-          isOverridden: false,
-          actualMade: ''
-        },
-        { 
-          day: 'Tuesday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Old El Paso Family Taco Night', 
-            gear: 'Skillet', 
-            freshness: 'high',
-            timing: 'Prep: 5 min | Cook: 10 min',
-            steps: [
-              'Brown meat in skillet over medium-high heat until cooked (8-10 min). Stir in taco seasoning and water; simmer 3 min.',
-              'Warm soft tortillas and taco shells in the oven (325°F for 3 min) or microwave for 25 sec.',
-              'Serve with shredded cheddar, sour cream, mayo, and Mexican corn salad.'
-            ],
-            thaw: 'None needed.',
-            nutrients: ['Iron', 'Calcium', 'Fiber', 'Zinc', 'Potassium']
-          },
-          lowEffort: {
-            title: '10-Minute Cheesy Taco Nacho Skillet',
-            gear: 'Sheet Pan / Oven (375°F)',
-            freshness: 'high',
-            timing: 'Prep: 2 min | Cook: 8 min',
-            steps: [
-              'Spread taco shells/chips on a sheet pan, top with meat and shredded cheddar.',
-              'Bake at 375°F for 6 min until cheese is melted.'
-            ],
-            thaw: 'None needed.',
-            nutrients: ['Calcium', 'Iron', 'Potassium']
-          },
-          backups: [
-            {
-              title: 'Cuisine Adventures Mini Quiches & Sliced Fruit',
-              gear: 'Air Fryer (375°F / 10 min)',
-              freshness: 'high',
-              timing: 'Prep: 1 min | Cook: 10 min',
-              steps: ['Bake frozen mini quiches at 375°F for 10-12 min until hot and golden.', 'Serve with fresh blueberries or sliced bananas.'],
-              nutrients: ['Vit D', 'Calcium', 'Iron', 'Zinc'],
-              thaw: 'None (cook straight from freezer).'
-            }
-          ],
-          isOverridden: false,
-          actualMade: ''
-        },
-        { 
-          day: 'Wednesday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Kirkland Signature Italian Sausage & Beef Lasagna', 
-            gear: 'Oven (375°F / 190°C) & Air Fryer', 
-            freshness: 'mid',
-            timing: 'Prep: 2 min | Cook: 55 min',
-            steps: [
-              'Preheat oven to 375°F. Tent foil over Kirkland lasagna tray and bake per box instructions (50-55 min, uncover last 10 min).',
-              'While lasagna rests for 5 min, cook mozzarella sticks in the air fryer at 390°F for 5-6 min until crispy.',
-              'Slice cucumbers into crunchy dipping sticks.'
-            ],
-            thaw: 'Move frozen lasagna to fridge morning of (or bake frozen).',
-            nutrients: ['Iron', 'Calcium', 'Vit C', 'Potassium']
-          },
-          lowEffort: {
-            title: 'Air Fryer Mozza Sticks & Cheesy Pasta Quick-Plate',
-            gear: 'Air Fryer (390°F) & Stove',
-            freshness: 'mid',
-            timing: 'Prep: 2 min | Cook: 10 min',
-            steps: ['Boil noodles with butter and cheese.', 'Air fry mozza sticks for 6 min at 390°F.'],
-            thaw: 'None.',
-            nutrients: ['Calcium', 'Vit C']
-          },
-          backups: [
-            {
-              title: 'Olivieri Butternut Squash & Mascarpone Ravioli',
-              gear: 'Stove Pot (8 min)',
-              freshness: 'mid',
-              timing: 'Prep: 1 min | Cook: 7 min',
-              steps: ['Boil ravioli in gently salted water for 6-7 min until floating.', 'Toss with melted butter and cracked pepper; serve with cucumber coins.'],
-              nutrients: ['Calcium', 'Potassium', 'Fiber'],
-              thaw: 'None.'
-            }
-          ],
-          isOverridden: false,
-          actualMade: ''
-        },
-        { 
-          day: 'Thursday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Elevated Kraft Dinner with Crispy Mozza Sticks & Bacon', 
-            gear: 'Stove Pot & Air Fryer (390°F / 200°C)', 
-            freshness: 'mid',
-            timing: 'Prep: 2 min | Cook: 12 min',
-            steps: [
-              'Boil macaroni in water for 7-8 min until tender. Drain well.',
-              'Add butter, milk, cheese seasoning, and stir in extra shredded Marble Cheddar.',
-              'Air fry mozzarella sticks and bacon strips at 390°F for 6 min until sizzling.',
-              'Serve hot with fresh blueberries on the side.'
-            ],
-            thaw: 'None needed.',
-            nutrients: ['Calcium', 'Vit C', 'Fiber']
-          },
-          lowEffort: {
-            title: 'Simple KD & Crispy Cheestrings Plate',
-            gear: 'Stove Pot (8 min)',
-            freshness: 'mid',
-            timing: 'Prep: 1 min | Cook: 8 min',
-            steps: ['Boil KD 7 min, mix with butter and cheese powder.', 'Serve with peeled Cheestrings and blueberries.'],
-            thaw: 'None.',
-            nutrients: ['Calcium']
-          },
-          backups: [],
-          isOverridden: false,
-          actualMade: ''
-        },
-        { 
-          day: 'Friday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Motor City Detroit-Style Deep Dish Pizza Night', 
-            gear: 'Oven (425°F / 220°C)', 
-            freshness: 'low',
-            timing: 'Prep: 1 min | Cook: 19 min',
-            steps: [
-              'Preheat oven to 425°F. Place pizza in included pan directly on center oven rack.',
-              'Bake 18-21 min until cheese bubbles throughout and edges are crispy and deep golden.',
-              'Rest 3 min, slide onto cutting board, and slice into square portions.'
-            ],
-            thaw: 'None (cooks straight from freezer).',
-            nutrients: ['Calcium', 'Iron', 'Fiber']
-          },
-          lowEffort: {
-            title: 'Motor City Detroit Pizza Slices',
-            gear: 'Oven (425°F)',
-            freshness: 'low',
-            timing: 'Prep: 1 min | Cook: 19 min',
-            steps: ['Bake 19 min.', 'Slice into squares.'],
-            thaw: 'None.',
-            nutrients: ['Calcium', 'Iron']
-          },
-          backups: [],
-          isOverridden: false,
-          actualMade: ''
-        },
-        { 
-          day: 'Saturday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Minh Egg Rolls & Chicken Samosas with Cheesy Garlic Ciabatta', 
-            gear: 'Air Fryer (375°F / 190°C) & Toaster', 
-            freshness: 'low',
-            timing: 'Prep: 5 min | Cook: 14 min',
-            steps: [
-              'Place egg rolls and chicken samosas in air fryer at 375°F for 12-14 min, shaking halfway.',
-              'Slice ciabatta buns, spread butter, garlic powder, top with cheese, and toast until bubbling.',
-              'Slice fresh cucumber rounds and serve with sweet dipping sauces.'
-            ],
-            thaw: 'None (air fry straight from freezer).',
-            nutrients: ['Fiber', 'Calcium', 'Vit C', 'Potassium']
-          },
-          lowEffort: {
-            title: '12-Minute Air Fryer Samosas & Cheesy Toast',
-            gear: 'Air Fryer (375°F)',
-            freshness: 'low',
-            timing: 'Prep: 2 min | Cook: 12 min',
-            steps: ['Air fry frozen samosas and egg rolls at 375°F for 12 min.', 'Serve with toasted cheese ciabatta.'],
-            thaw: 'None.',
-            nutrients: ['Fiber', 'Calcium']
-          },
-          backups: [
-            {
-              title: 'Mr. Donair Donair Dunkers with Warm Sweet Dip',
-              gear: 'Air Fryer (375°F / 10 min)',
-              freshness: 'low',
-              timing: 'Prep: 1 min | Cook: 10 min',
-              steps: ['Air fry Donair Dunkers at 375°F for 9-11 min until crispy.', 'Warm donair dipping sauce and serve with sliced cucumber.'],
-              nutrients: ['Iron', 'Zinc', 'Calcium'],
-              thaw: 'None.'
-            }
-          ],
-          isOverridden: false,
-          actualMade: ''
-        },
-        { 
-          day: 'Sunday', 
-          effort: 'standard',
-          selectedBackupIndex: null,
-          standard: {
-            title: 'Garofalo Spaghettini with Pan-Seared Chicken & Melted Beemster', 
-            gear: 'Pasta Pot & Cast-Iron Skillet', 
-            freshness: 'low',
-            timing: 'Prep: 5 min | Cook: 15 min',
-            steps: [
-              'Boil spaghettini in salted water for 8 min. Reserve 1/4 cup pasta water, drain, and toss with butter.',
-              'Season chicken breasts with Montreal Chicken or salt & pepper. Pan-sear in skillet with butter/oil over medium heat for 6-7 min per side until 165°F.',
-              'Toss hot pasta with reserved cooking water and finely grated Beemster cheese until a silky sauce coats noodles.',
-              'Serve pasta topped with sliced chicken breast and fresh cucumber rounds.'
-            ],
-            thaw: 'Move chicken breasts to fridge.',
-            nutrients: ['Iron', 'Calcium', 'Zinc', 'Magnesium']
-          },
-          lowEffort: {
-            title: '12-Minute Buttered Beemster Cheesy Noodles',
-            gear: 'Stove Pot (10 min)',
-            freshness: 'low',
-            timing: 'Prep: 2 min | Cook: 8 min',
-            steps: ['Boil noodles 8 min.', 'Toss with butter and melted Beemster.', 'Serve with cold cucumber rounds.'],
-            thaw: 'None.',
-            nutrients: ['Calcium', 'Protein']
-          },
-          backups: [
-            {
-              title: 'Pan-Seared Basa Fillets with Garlic Butter Rice',
-              gear: 'Skillet (12 min)',
-              freshness: 'low',
-              timing: 'Prep: 2 min | Cook: 10 min',
-              steps: ['Season Basa fillets with salt, pepper, and garlic powder.', 'Pan-fry in butter/avocado oil for 4 min per side until flaky.', 'Serve alongside warm rice and cucumber rounds.'],
-              nutrients: ['Iron', 'Vit D', 'Omega-3'],
-              thaw: 'Move basa fillets to fridge.'
-            }
-          ],
-          isOverridden: false,
-          actualMade: ''
-        }
-      ];
-      renderPlan();
     }
 
     function switchTab(tabId) {
@@ -2100,7 +2199,16 @@
       }
       var savedPlan = localStorage.getItem('prince_plan');
       if (savedPlan) {
-        try { state.plan = JSON.parse(savedPlan); } catch(e){}
+        try { 
+          var parsedPlan = JSON.parse(savedPlan); 
+          if (parsedPlan && parsedPlan.length && parsedPlan[0].options) {
+            state.plan = parsedPlan;
+          } else {
+            generatePlan();
+          }
+        } catch(e){
+          generatePlan();
+        }
       } else {
         generatePlan();
       }
