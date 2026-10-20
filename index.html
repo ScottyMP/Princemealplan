@@ -84,45 +84,44 @@
   <!-- Main Content Container -->
   <main class="max-w-xl mx-auto p-4 pb-24 space-y-4">
 
-    <!-- TAB 1: CATEGORIZED GROCERY & SHOPPING LIST -->
+    <!-- TAB 1: INTERACTIVE CATEGORIZED GROCERY & SHOPPING LIST -->
     <section id="tab-groceries" class="space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Add to Shopping List</h2>
-          <span class="text-[10px] text-slate-400">Auto-sorted by category</span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Shopping List & Extras</h2>
+          <span class="text-[10px] text-slate-400">Auto-sorted by store department</span>
         </div>
 
         <div class="flex gap-2">
-          <input type="text" id="quickItemInput" placeholder="Add grocery item (e.g. Bananas, Milk, Bread)..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
-          <button type="button" onclick="addManualItem()" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
+          <input type="text" id="quickItemInput" placeholder="Add item (e.g. Bananas, Milk, Bread)..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <button type="button" onclick="addManualItem(false)" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <button type="button" onclick="openReceiptRestockModal()" class="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
-            <span>🧾</span> Paste Receipt to Restock
+        <!-- Quick Entry & Danielle's Request Button -->
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="promptDanielleRequest()" class="py-2 px-3 rounded-lg bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>💜</span> + Danielle's Request
           </button>
-          <button type="button" onclick="shareToGoogleKeep()" class="w-full py-2.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
-            <span>📤</span> Export to Google Keep
+          <button type="button" onclick="shareToGoogleKeep()" class="py-2 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>📤</span> Export to Keep
           </button>
         </div>
 
-        <div class="space-y-1.5 pt-1">
-          <p class="text-[11px] font-semibold text-slate-500">Quick-tap produce & fresh staples:</p>
-          <div class="flex flex-wrap gap-1.5">
-            <button type="button" onclick="quickAdd('Bananas', 'Produce & Fresh Produce')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Bananas</button>
-            <button type="button" onclick="quickAdd('Long English Cucumbers 3pk', 'Produce & Fresh Produce')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Cucumbers</button>
-            <button type="button" onclick="quickAdd('Sweet Bell Peppers', 'Produce & Fresh Produce')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Bell Peppers</button>
-            <button type="button" onclick="quickAdd('Brioche Buns', 'Baking, Grains & Breads')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Brioche Buns</button>
-            <button type="button" onclick="quickAdd('Mexican Street Corn Salad Kit', 'Produce & Fresh Produce')" class="px-2 py-1 text-xs rounded-md bg-slate-100 dark:bg-slate-800 font-medium hover:bg-red-50 hover:text-red-600">+ Salad Kit</button>
-          </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button type="button" onclick="restockCheckedItems()" class="py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>✓</span> Restock Checked Items
+          </button>
+          <button type="button" onclick="openReceiptRestockModal()" class="py-2 px-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+            <span>🧾</span> Paste Receipt
+          </button>
         </div>
       </div>
 
-      <!-- Categorized Active Shopping List -->
+      <!-- Categorized In-Store Interactive Grocery List -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
           <div>
-            <h2 class="text-sm font-bold">Aisle-by-Aisle Shopping List</h2>
+            <h2 class="text-sm font-bold">In-Store Checklist (Tap to cross off)</h2>
             <p class="text-xs text-slate-500" id="itemCountLabel">0 items needed</p>
           </div>
           <button type="button" onclick="clearExtraItems()" class="text-xs text-red-600 dark:text-red-400 font-medium hover:underline">Clear Extras</button>
@@ -132,7 +131,7 @@
       </div>
     </section>
 
-    <!-- TAB 2: PANTRY & STAPLES -->
+    <!-- TAB 2: PANTRY & STAPLES (WITH INSTANT SEARCH BAR) -->
     <section id="tab-pantry" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-2.5">
         <div class="flex items-center justify-between">
@@ -141,7 +140,7 @@
             <span>✨</span> Smart Bulk Paste (Auto-Sorts)
           </button>
         </div>
-        <p class="text-[11px] text-slate-500">Tap <strong>"In Stock"</strong> to switch it to <strong>"LOW"</strong> when you run out. It instantly appears on Tab 1 (Grocery List) and auto-swaps dependent meals.</p>
+        <p class="text-[11px] text-slate-500">Tap status button: <strong>In Stock</strong> ➔ <strong>LOW</strong> ➔ <strong>OUT</strong> ➔ <strong>In Stock</strong>.</p>
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
           <input type="text" id="newPantryItemName" placeholder="e.g. Sirloin Steak, Avocado Oil..." class="sm:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -169,8 +168,9 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm">
-        <div class="flex items-center justify-between mb-2">
+      <!-- Inventory Search & List -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
           <div>
             <h2 class="text-sm font-bold">Pantry & Freezer Inventory</h2>
             <p class="text-xs text-slate-500" id="pantryCountLabel">Persistent household stock</p>
@@ -179,11 +179,19 @@
             ↺ Restore Missing Staples
           </button>
         </div>
+
+        <!-- Real-Time Search Bar -->
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
+          <input type="text" id="pantrySearchInput" oninput="handlePantrySearch(this.value)" placeholder="Search spices, meats, cheeses, freezer items..." class="w-full pl-8 pr-8 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <button type="button" onclick="clearPantrySearch()" id="clearSearchBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-xs hidden font-bold">✕</button>
+        </div>
+
         <div id="pantryCategoriesContainer" class="space-y-4 pt-1"></div>
       </div>
     </section>
 
-    <!-- TAB 3: DINNERS (SLIDE-THROUGH DAY-BY-DAY VIEW) -->
+    <!-- TAB 3: DINNERS (DAY-BY-DAY SLIDER) -->
     <section id="tab-plan" class="hidden space-y-3">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
@@ -278,12 +286,12 @@
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Reconcile Costco Receipt</h3>
-          <p class="text-[11px] text-slate-500">Items bought will move to "In Stock". Missing stay on list!</p>
+          <p class="text-[11px] text-slate-500">Items bought move to "In Stock". Missing stay on list!</p>
         </div>
         <button type="button" onclick="closeReceiptRestockModal()" class="text-slate-400 hover:text-slate-600 p-1 font-bold">✕</button>
       </div>
 
-      <textarea id="receiptImportText" rows="7" placeholder="Paste what you bought from your Costco receipt here, e.g.:&#10;Maple Leaf Prime Chicken Breasts&#10;HOMO MILK 4L&#10;Marble Cheddar&#10;Brioche Buns" class="w-full p-2.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"></textarea>
+      <textarea id="receiptImportText" rows="7" placeholder="Paste items from receipt here, e.g.:&#10;Maple Leaf Prime Chicken Breasts&#10;HOMO MILK 4L&#10;Marble Cheddar&#10;Brioche Buns" class="w-full p-2.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"></textarea>
 
       <div class="flex gap-2 pt-1">
         <button type="button" onclick="processReceiptRestock()" class="flex-1 py-2 bg-emerald-600 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-emerald-700 active:scale-98">
@@ -490,12 +498,14 @@
       family: { adults: 2, kids: 1, guests: 0 },
       manualGroceryItems: [],
       pantry: VERIFIED_PANTRY_STOCK.slice(),
+      checkedGroceryMap: {},
       plan: [],
       thawDone: false
     };
 
     var currentDayIndex = 0;
     var selectedNutrientDetail = null;
+    var pantrySearchFilter = '';
     var dbRef = null;
 
     var standardNutrients = ['Iron', 'Calcium', 'Fiber', 'Vit C', 'Vit D', 'Zinc', 'Omega-3', 'Potassium', 'Magnesium'];
@@ -577,36 +587,41 @@
     }
 
     /* ========================================================
-       TAB 1: AISLE-BY-AISLE CATEGORIZED GROCERY LIST
+       TAB 1: AISLE-BY-AISLE INTERACTIVE GROCERY CHECKLIST
        ======================================================== */
     function getFullGroceryList() {
       var list = [];
-      
-      // 1. Pantry items marked 'low'
       state.pantry.forEach(function(p, pIdx) {
-        if (p.status === 'low') {
+        if (p.status === 'low' || p.status === 'out') {
           list.push({
             id: 'pantry_' + pIdx,
             name: p.name,
             source: 'pantry',
+            status: p.status,
             pantryIndex: pIdx,
             cat: p.cat || 'General Pantry'
           });
         }
       });
 
-      // 2. Extra ad-hoc items
       state.manualGroceryItems.forEach(function(m, mIdx) {
         list.push({
           id: 'manual_' + mIdx,
           name: m.name,
           source: 'manual',
+          isDanielle: m.isDanielle || false,
           manualIndex: mIdx,
           cat: m.cat || autoCategorizePantryItem(m.name)
         });
       });
 
       return list;
+    }
+
+    function toggleGroceryCheck(id) {
+      state.checkedGroceryMap[id] = !state.checkedGroceryMap[id];
+      renderGroceryList();
+      syncToCloud();
     }
 
     function renderGroceryList() {
@@ -616,14 +631,16 @@
       container.innerHTML = '';
 
       var fullList = getFullGroceryList();
-      if (countEl) countEl.textContent = fullList.length + ' item(s) needed';
+      var checkedCount = 0;
+      fullList.forEach(function(i) { if (state.checkedGroceryMap[i.id]) checkedCount++; });
+
+      if (countEl) countEl.textContent = fullList.length + ' item(s) needed (' + checkedCount + ' in cart)';
 
       if (!fullList.length) {
-        container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">Everything is fully stocked! Tap "In Stock" in Tab 2 whenever anything runs low to build your list.</div>';
+        container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">Everything is fully stocked! Tap status on Tab 2 when anything runs low.</div>';
         return;
       }
 
-      // Group by Category
       var groups = {};
       fullList.forEach(function(item) {
         var c = item.cat || 'General Grocery';
@@ -644,7 +661,6 @@
         'General Pantry'
       ];
 
-      // Render ordered categories first
       categoryOrder.forEach(function(catName) {
         if (groups[catName] && groups[catName].length) {
           renderGroceryCategoryGroup(container, catName, groups[catName]);
@@ -652,7 +668,6 @@
         }
       });
 
-      // Render any remaining custom categories
       for (var customCat in groups) {
         if (groups[customCat].length) {
           renderGroceryCategoryGroup(container, customCat, groups[customCat]);
@@ -671,14 +686,25 @@
 
       var listHtml = '<ul class="divide-y divide-slate-100 dark:divide-slate-800/80">';
       items.forEach(function(item) {
-        var sourceBadge = item.source === 'pantry'
-          ? '<span class="text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-1.5 py-0.5 rounded ml-2">Pantry Low</span>'
-          : '<span class="text-[9px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded ml-2">Extra</span>';
+        var isChecked = !!state.checkedGroceryMap[item.id];
+        
+        var sourceBadge = '';
+        if (item.isDanielle) {
+          sourceBadge = '<span class="text-[9px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 px-1.5 py-0.5 rounded ml-2">Danielle\'s Pick</span>';
+        } else if (item.status === 'out') {
+          sourceBadge = '<span class="text-[9px] font-black text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 px-1.5 py-0.5 rounded ml-2">OUT</span>';
+        } else if (item.source === 'pantry') {
+          sourceBadge = '<span class="text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-1.5 py-0.5 rounded ml-2">LOW</span>';
+        }
 
         listHtml += 
-          '<li class="py-2 flex items-center justify-between text-xs">' +
-            '<div><span class="font-bold text-slate-800 dark:text-slate-200">• ' + item.name + '</span>' + sourceBadge + '</div>' +
-            '<button type="button" onclick="removeGroceryItem(\'' + item.id + '\')" class="text-slate-400 hover:text-red-500 p-1 font-bold">✕</button>' +
+          '<li class="py-2.5 flex items-center justify-between text-xs cursor-pointer select-none ' + (isChecked ? 'opacity-40' : '') + '">' +
+            '<div class="flex items-center gap-2.5 flex-1" onclick="toggleGroceryCheck(\'' + item.id + '\')">' +
+              '<input type="checkbox" ' + (isChecked ? 'checked' : '') + ' class="w-4 h-4 rounded text-emerald-600 focus:ring-0 cursor-pointer pointer-events-none">' +
+              '<span class="font-bold ' + (isChecked ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200') + '">' + item.name + '</span>' +
+              sourceBadge +
+            '</div>' +
+            '<button type="button" onclick="removeGroceryItem(\'' + item.id + '\')" class="text-slate-400 hover:text-red-500 p-1 font-bold ml-2">✕</button>' +
           '</li>';
       });
       listHtml += '</ul>';
@@ -698,32 +724,70 @@
         var mIdx = parseInt(id.replace('manual_', ''));
         state.manualGroceryItems.splice(mIdx, 1);
       }
+      delete state.checkedGroceryMap[id];
       renderGroceryList();
       syncToCloud();
     }
 
     function clearExtraItems() {
-      if (!confirm('Clear extra added items? (Pantry items marked low will remain)')) return;
+      if (!confirm('Clear extra additions? (Pantry items marked low will remain)')) return;
       state.manualGroceryItems = [];
       renderGroceryList();
       syncToCloud();
     }
 
-    function addManualItem() {
+    function addManualItem(isDanielle) {
       var input = document.getElementById('quickItemInput');
       var val = input.value.trim();
       if (!val) return;
       var detectedCat = autoCategorizePantryItem(val);
-      state.manualGroceryItems.push({ name: val, cat: detectedCat });
+      state.manualGroceryItems.push({ name: val, cat: detectedCat, isDanielle: !!isDanielle });
       input.value = '';
       renderGroceryList();
       syncToCloud();
     }
 
-    function quickAdd(name, cat) {
-      state.manualGroceryItems.push({ name: name, cat: cat || autoCategorizePantryItem(name) });
+    function promptDanielleRequest() {
+      var item = prompt('Danielle: What item would you like added to the grocery list?');
+      if (item && item.trim()) {
+        var clean = item.trim();
+        var detectedCat = autoCategorizePantryItem(clean);
+        state.manualGroceryItems.push({ name: clean, cat: detectedCat, isDanielle: true });
+        renderGroceryList();
+        syncToCloud();
+      }
+    }
+
+    function restockCheckedItems() {
+      var fullList = getFullGroceryList();
+      var checkedItems = fullList.filter(function(i) { return !!state.checkedGroceryMap[i.id]; });
+
+      if (!checkedItems.length) {
+        alert('No items checked! Tap items as you place them into your cart to cross them off.');
+        return;
+      }
+
+      if (!confirm('Restock ' + checkedItems.length + ' checked item(s) back to your Pantry? Unchecked items will stay on your list.')) return;
+
+      checkedItems.forEach(function(item) {
+        if (item.source === 'pantry') {
+          if (state.pantry[item.pantryIndex]) {
+            state.pantry[item.pantryIndex].status = 'stocked';
+          }
+        }
+        delete state.checkedGroceryMap[item.id];
+      });
+
+      // Clear checked manual items
+      state.manualGroceryItems = state.manualGroceryItems.filter(function(m, mIdx) {
+        return !state.checkedGroceryMap['manual_' + mIdx];
+      });
+
+      renderPantry();
       renderGroceryList();
+      renderPlan();
       syncToCloud();
+      alert('✓ Restocked ' + checkedItems.length + ' items to your Pantry! Remaining items are saved on your list.');
     }
 
     /* ========================================================
@@ -751,7 +815,6 @@
         if (clean.length < 2) return;
         var cleanLower = clean.toLowerCase();
 
-        // 1. Check if matches any item in pantry
         var foundInPantry = false;
         state.pantry.forEach(function(p) {
           var pLower = p.name.toLowerCase();
@@ -762,7 +825,6 @@
           }
         });
 
-        // 2. Check if matches any extra manual grocery item
         for (var m = state.manualGroceryItems.length - 1; m >= 0; m--) {
           var mLower = state.manualGroceryItems[m].name.toLowerCase();
           if (mLower.indexOf(cleanLower) !== -1 || cleanLower.indexOf(mLower) !== -1) {
@@ -771,7 +833,6 @@
           }
         }
 
-        // 3. If item was completely new (not in pantry), auto-add it as stocked
         if (!foundInPantry) {
           var targetCat = autoCategorizePantryItem(clean);
           state.pantry.push({ cat: targetCat, name: clean, status: 'stocked' });
@@ -780,18 +841,19 @@
       });
 
       closeReceiptRestockModal();
+      state.checkedGroceryMap = {};
       renderPantry();
       renderGroceryList();
       renderPlan();
       syncToCloud();
 
       var remainingLow = getFullGroceryList().length;
-      var msg = '✓ Reconciled receipt!\n\n• ' + matchedCount + ' items marked as IN STOCK.';
-      if (newlyAddedCount > 0) msg += '\n• ' + newlyAddedCount + ' brand new items added to your permanent pantry.';
+      var msg = '✓ Reconciled receipt!\n\n• ' + matchedCount + ' items marked IN STOCK.';
+      if (newlyAddedCount > 0) msg += '\n• ' + newlyAddedCount + ' new items added to permanent pantry.';
       if (remainingLow > 0) {
         msg += '\n\n⚠️ ' + remainingLow + ' item(s) you did not purchase remain on your Grocery List for next time.';
       } else {
-        msg += '\n\n🎉 Everything on your grocery list was purchased!';
+        msg += '\n\n🎉 Everything on your list was bought!';
       }
       alert(msg);
     }
@@ -810,7 +872,8 @@
       fullList.forEach(function(item) {
         var c = item.cat || 'General Grocery';
         if (!groups[c]) groups[c] = [];
-        groups[c].push(item.name);
+        var prefix = item.isDanielle ? '[Danielle] ' : (item.status === 'out' ? '[OUT] ' : '');
+        groups[c].push(prefix + item.name);
       });
 
       var textList = '🛒 PRINCE GROCERY & COSTCO LIST\n\n';
@@ -843,18 +906,72 @@
     }
 
     /* ========================================================
-       PANTRY FUNCTIONS
+       PANTRY FUNCTIONS & 3-WAY STATUS CYCLE (In Stock -> LOW -> OUT)
        ======================================================== */
+    function cyclePantryStatus(index) {
+      var p = state.pantry[index];
+      if (!p) return;
+
+      if (p.status === 'stocked') {
+        p.status = 'low';
+        checkAndAutoSwapMeals(p.name);
+      } else if (p.status === 'low') {
+        p.status = 'out';
+        checkAndAutoSwapMeals(p.name);
+      } else {
+        p.status = 'stocked';
+      }
+
+      renderPantry();
+      renderGroceryList();
+      syncToCloud();
+    }
+
+    function handlePantrySearch(query) {
+      pantrySearchFilter = (query || '').toLowerCase().trim();
+      var clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) {
+        if (pantrySearchFilter.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+      renderPantry();
+    }
+
+    function clearPantrySearch() {
+      var input = document.getElementById('pantrySearchInput');
+      if (input) input.value = '';
+      pantrySearchFilter = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderPantry();
+    }
+
     function renderPantry() {
       var container = document.getElementById('pantryCategoriesContainer');
       if (!container) return;
       container.innerHTML = '';
 
       var cats = {};
+      var totalMatchCount = 0;
+
       state.pantry.forEach(function(p, idx) {
+        if (pantrySearchFilter) {
+          var matchName = p.name.toLowerCase().indexOf(pantrySearchFilter) !== -1;
+          var matchCat = p.cat.toLowerCase().indexOf(pantrySearchFilter) !== -1;
+          if (!matchName && !matchCat) return;
+        }
+
         if (!cats[p.cat]) cats[p.cat] = [];
         cats[p.cat].push({ item: p, originalIndex: idx });
+        totalMatchCount++;
       });
+
+      if (pantrySearchFilter && totalMatchCount === 0) {
+        container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">No items matching "' + pantrySearchFilter + '".</div>';
+        return;
+      }
 
       for (var catName in cats) {
         var catBox = document.createElement('div');
@@ -863,12 +980,22 @@
         var listHtml = '<div class="space-y-1.5">';
 
         cats[catName].forEach(function(entry) {
-          var isLow = entry.item.status === 'low';
-          var badge = isLow 
-            ? '<button type="button" onclick="togglePantryStock(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300">LOW (Added)</button>'
-            : '<button type="button" onclick="togglePantryStock(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300">In Stock</button>';
+          var st = entry.item.status || 'stocked';
+          var badge = '';
 
-          listHtml += '<div class="flex items-center justify-between text-xs py-1"><div class="flex items-center gap-1.5"><button type="button" onclick="deletePantryItem(' + entry.originalIndex + ')" class="text-slate-300 hover:text-red-500 text-[11px] font-bold">✕</button><span class="' + (isLow ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-800 dark:text-slate-200') + '">' + entry.item.name + '</span></div>' + badge + '</div>';
+          if (st === 'out') {
+            badge = '<button type="button" onclick="cyclePantryStatus(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300">OUT (Tap)</button>';
+          } else if (st === 'low') {
+            badge = '<button type="button" onclick="cyclePantryStatus(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300">LOW (Tap)</button>';
+          } else {
+            badge = '<button type="button" onclick="cyclePantryStatus(' + entry.originalIndex + ')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300">In Stock</button>';
+          }
+
+          var nameStyle = st === 'out' 
+            ? 'text-rose-600 dark:text-rose-400 font-bold line-through' 
+            : (st === 'low' ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-slate-800 dark:text-slate-200');
+
+          listHtml += '<div class="flex items-center justify-between text-xs py-1"><div class="flex items-center gap-1.5"><button type="button" onclick="deletePantryItem(' + entry.originalIndex + ')" class="text-slate-300 hover:text-red-500 text-[11px] font-bold">✕</button><span class="' + nameStyle + '">' + entry.item.name + '</span></div>' + badge + '</div>';
         });
 
         listHtml += '</div>';
@@ -877,7 +1004,11 @@
       }
 
       var pCount = document.getElementById('pantryCountLabel');
-      if (pCount) pCount.textContent = state.pantry.length + ' household items tracked';
+      if (pCount) {
+        pCount.textContent = pantrySearchFilter 
+          ? 'Showing ' + totalMatchCount + ' of ' + state.pantry.length + ' items'
+          : state.pantry.length + ' household items tracked';
+      }
     }
 
     function addNewPantryItem() {
@@ -909,19 +1040,6 @@
       renderPantry();
       syncToCloud();
       checkAndAutoSwapMeals(itemName);
-    }
-
-    function togglePantryStock(index) {
-      var p = state.pantry[index];
-      if (p.status === 'stocked') {
-        p.status = 'low';
-        checkAndAutoSwapMeals(p.name);
-      } else {
-        p.status = 'stocked';
-      }
-      renderPantry();
-      renderGroceryList();
-      syncToCloud();
     }
 
     function checkAndAutoSwapMeals(missingItemName) {
@@ -970,7 +1088,7 @@
       renderGroceryList();
       if (swappedDays.length > 0) {
         renderPlan();
-        alert('Notice: ' + missingItemName + ' is marked LOW!\n\nDinners on ' + swappedDays.join(', ') + ' were automatically swapped to backup meals, and "' + missingItemName + '" was placed in Tab 1 (Grocery List).');
+        alert('Notice: ' + missingItemName + ' is LOW or OUT!\n\nDinners on ' + swappedDays.join(', ') + ' were automatically swapped to backup meals, and "' + missingItemName + '" was placed on Tab 1 (Grocery List).');
       }
     }
 
@@ -1900,6 +2018,10 @@
             localStorage.setItem('prince_grocery_extras', JSON.stringify(state.manualGroceryItems));
             renderGroceryList();
           }
+          if (val && val.checkedGroceryMap) {
+            state.checkedGroceryMap = val.checkedGroceryMap;
+            renderGroceryList();
+          }
           if (val && val.pantry) {
             state.pantry = val.pantry;
             localStorage.setItem('prince_pantry', JSON.stringify(state.pantry));
@@ -1939,6 +2061,7 @@
         dbRef.set({
           family: state.family,
           manualGroceryItems: state.manualGroceryItems,
+          checkedGroceryMap: state.checkedGroceryMap,
           pantry: state.pantry,
           plan: state.plan,
           thawDone: state.thawDone,
