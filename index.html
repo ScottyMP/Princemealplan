@@ -2263,3 +2263,76 @@
           manualGroceryItems: state.manualGroceryItems,
           checkedGroceryMap: state.checkedGroceryMap,
           pantry: state.pantry,
+          plan: state.plan,
+          thawDone: state.thawDone,
+          updatedAt: Date.now()
+        });
+      }
+    }
+
+    function updateCloudBadge(connected) {
+      var pill = document.getElementById('cloudStatusBtn');
+      var txt = document.getElementById('cloudStatusText');
+      if (!pill || !txt) return;
+      if (connected) {
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 cursor-pointer';
+        txt.textContent = 'Synced';
+      } else {
+        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer';
+        txt.textContent = 'Connecting...';
+      }
+    }
+
+    function init() {
+      var savedFam = localStorage.getItem('prince_family');
+      if (savedFam) {
+        try { state.family = JSON.parse(savedFam); } catch(e){}
+      }
+      var savedExtras = localStorage.getItem('prince_grocery_extras');
+      if (savedExtras) {
+        try { state.manualGroceryItems = JSON.parse(savedExtras); } catch(e){}
+      }
+      var savedPantry = localStorage.getItem('prantry_items') || localStorage.getItem('prince_pantry');
+      if (savedPantry) {
+        try { state.pantry = JSON.parse(savedPantry); } catch(e){}
+      } else {
+        state.pantry = VERIFIED_PANTRY_STOCK.slice();
+      }
+      var savedPlan = localStorage.getItem('prince_plan');
+      if (savedPlan) {
+        try { 
+          var parsedPlan = JSON.parse(savedPlan); 
+          if (parsedPlan && parsedPlan.length && parsedPlan[0].options) {
+            state.plan = parsedPlan;
+          } else {
+            generatePlan();
+          }
+        } catch(e){
+          generatePlan();
+        }
+      } else {
+        generatePlan();
+      }
+
+      var savedThaw = localStorage.getItem('prince_thaw_done');
+      if (savedThaw !== null) {
+        try { state.thawDone = JSON.parse(savedThaw); } catch(e){}
+      }
+
+      var savedTheme = localStorage.getItem('prince_theme') || 'light';
+      if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+      updateThemeIcon();
+
+      renderFamilyCounters();
+      renderPantry();
+      renderGroceryList();
+      renderPlan();
+      updateThawBannerUI();
+      setupSwipeGestures();
+      initFirebase();
+    }
+
+    init();
+  </script>
+</body>
+</html>
