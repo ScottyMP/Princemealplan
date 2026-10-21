@@ -84,7 +84,7 @@
   <!-- Main Content Container -->
   <main class="max-w-xl mx-auto p-4 pb-24 space-y-4">
 
-    <!-- TAB 1: INTERACTIVE GROCERY LIST -->
+    <!-- TAB 1: INTERACTIVE GROCERY LIST (WITH LIVE SEARCH) -->
     <section id="tab-groceries" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
@@ -93,7 +93,7 @@
         </div>
 
         <div class="flex gap-2">
-          <input type="text" id="quickItemInput" placeholder="Add item (e.g. Bananas, Milk, Bread)..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <input type="text" id="quickItemInput" placeholder="Add extra item (e.g. Bananas, Milk, Bread)..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
           <button type="button" onclick="addManualItem(false)" class="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm hover:bg-red-700 active:scale-95">+</button>
         </div>
 
@@ -116,6 +116,7 @@
         </div>
       </div>
 
+      <!-- In-Store Checklist with Instant Search Bar -->
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
           <div>
@@ -123,6 +124,13 @@
             <p class="text-xs text-slate-500" id="itemCountLabel">0 items needed</p>
           </div>
           <button type="button" onclick="clearExtraItems()" class="text-xs text-red-600 dark:text-red-400 font-medium hover:underline">Clear Extras</button>
+        </div>
+
+        <!-- Live Search Bar for Grocery List -->
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
+          <input type="text" id="grocerySearchInput" oninput="handleGrocerySearch(this.value)" placeholder="Search needed items (e.g. chicken, bacon, milk, pasta)..." class="w-full pl-8 pr-8 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <button type="button" onclick="clearGrocerySearch()" id="clearGrocerySearchBtn" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-xs hidden font-bold">✕</button>
         </div>
 
         <div id="categorizedGroceryContainer" class="space-y-4 pt-1"></div>
@@ -187,7 +195,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: DINNERS (SLIDER WITH PICTURE -> ITEMS NEEDED -> INSTRUCTIONS) -->
+    <!-- TAB 3: DINNERS (4 PRESET OPTIONS + CUSTOM REPLACEMENT) -->
     <section id="tab-plan" class="space-y-3">
       <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 shadow-sm space-y-2">
         <div class="flex items-center justify-between">
@@ -208,10 +216,8 @@
         <div class="grid grid-cols-7 gap-1 pt-1" id="dayPillContainer"></div>
       </div>
 
-      <!-- Single Active Day Dinner Card -->
       <div id="dinnerCardsContainer" class="transition-all duration-200"></div>
 
-      <!-- Nutrient Audit -->
       <details class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 shadow-sm" open>
         <summary class="flex items-center justify-between text-xs font-bold cursor-pointer list-none select-none">
           <span class="uppercase tracking-wider text-slate-500 dark:text-slate-400">📊 9-Nutrient Dinner Audit (Tap to view fixes)</span>
@@ -504,6 +510,7 @@
     var currentDayIndex = 0;
     var selectedNutrientDetail = null;
     var pantrySearchFilter = '';
+    var grocerySearchFilter = '';
     var dbRef = null;
 
     var standardNutrients = ['Iron', 'Calcium', 'Fiber', 'Vit C', 'Vit D', 'Zinc', 'Omega-3', 'Potassium', 'Magnesium'];
@@ -585,7 +592,7 @@
     }
 
     /* ========================================================
-       TAB 1: AISLE-BY-AISLE INTERACTIVE GROCERY LIST
+       TAB 1: AISLE-BY-AISLE INTERACTIVE GROCERY LIST & SEARCH
        ======================================================== */
     function getFullGroceryList() {
       var list = [];
@@ -616,6 +623,25 @@
       return list;
     }
 
+    function handleGrocerySearch(query) {
+      grocerySearchFilter = (query || '').toLowerCase().trim();
+      var btn = document.getElementById('clearGrocerySearchBtn');
+      if (btn) {
+        if (grocerySearchFilter.length > 0) btn.classList.remove('hidden');
+        else btn.classList.add('hidden');
+      }
+      renderGroceryList();
+    }
+
+    function clearGrocerySearch() {
+      var input = document.getElementById('grocerySearchInput');
+      if (input) input.value = '';
+      grocerySearchFilter = '';
+      var btn = document.getElementById('clearGrocerySearchBtn');
+      if (btn) btn.classList.add('hidden');
+      renderGroceryList();
+    }
+
     function toggleGroceryCheck(id) {
       state.checkedGroceryMap[id] = !state.checkedGroceryMap[id];
       renderGroceryList();
@@ -629,13 +655,34 @@
       container.innerHTML = '';
 
       var fullList = getFullGroceryList();
+      var totalNeeded = fullList.length;
+
+      // Filter by search query if active
+      if (grocerySearchFilter) {
+        fullList = fullList.filter(function(item) {
+          var nameMatch = item.name.toLowerCase().indexOf(grocerySearchFilter) !== -1;
+          var catMatch = item.cat && item.cat.toLowerCase().indexOf(grocerySearchFilter) !== -1;
+          return nameMatch || catMatch;
+        });
+      }
+
       var checkedCount = 0;
       fullList.forEach(function(i) { if (state.checkedGroceryMap[i.id]) checkedCount++; });
 
-      if (countEl) countEl.textContent = fullList.length + ' item(s) needed (' + checkedCount + ' in cart)';
+      if (countEl) {
+        if (grocerySearchFilter) {
+          countEl.textContent = 'Showing ' + fullList.length + ' matching "' + grocerySearchFilter + '" (' + totalNeeded + ' total needed)';
+        } else {
+          countEl.textContent = totalNeeded + ' item(s) needed (' + checkedCount + ' in cart)';
+        }
+      }
 
       if (!fullList.length) {
-        container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">Everything is fully stocked! Tap status on Tab 2 when anything runs low.</div>';
+        if (grocerySearchFilter) {
+          container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">No items on your grocery list matching "' + grocerySearchFilter + '".</div>';
+        } else {
+          container.innerHTML = '<div class="py-6 text-center text-xs text-slate-400">Everything is fully stocked! Tap status on Tab 2 when anything runs low.</div>';
+        }
         return;
       }
 
@@ -761,7 +808,7 @@
       var checkedItems = fullList.filter(function(i) { return !!state.checkedGroceryMap[i.id]; });
 
       if (!checkedItems.length) {
-        alert('No items checked! Tap items as you place them into your cart to cross them off.');
+        alert('No items checked! Tap items as you place them into your cart to check them off.');
         return;
       }
 
@@ -1055,7 +1102,6 @@
         if (currentTitle.indexOf(query) !== -1) matches = true;
 
         if (matches && meal.options && meal.options.length) {
-          // Cycle to first option whose title does not contain missing ingredient
           var foundIndex = -1;
           for (var o = 0; o < meal.options.length; o++) {
             if (meal.options[o].title.toLowerCase().indexOf(query) === -1) {
@@ -1153,8 +1199,6 @@
       var kids = fam.kids || 0;
       var guests = fam.guests || 0;
       var totalPeople = adults + kids + guests;
-      var adultHeads = adults + guests;
-
       return totalPeople + ' Portions (' + adults + ' Adults, ' + kids + ' Kids' + (guests > 0 ? ', ' + guests + ' Guests' : '') + ')';
     }
 
@@ -1188,7 +1232,7 @@
     }
 
     /* ========================================================
-       TAB 3: DINNERS (PICTURE -> ITEMS NEEDED -> INSTRUCTIONS)
+       TAB 3: DINNERS (4 PRESETS + CUSTOM REPLACEMENT)
        ======================================================== */
     function getActiveRecipe(meal) {
       if (!meal) return {};
@@ -1203,7 +1247,13 @@
       var meal = state.plan[mealIdx];
       if (!meal) return;
       delete meal.autoSwappedNote;
-      meal.selectedOptionIndex = parseInt(optionIndex);
+
+      if (optionIndex === "custom") {
+        meal.isOverridden = true;
+      } else {
+        meal.isOverridden = false;
+        meal.selectedOptionIndex = parseInt(optionIndex);
+      }
       renderPlan();
       syncToCloud();
     }
@@ -1212,8 +1262,8 @@
       var meal = state.plan[mealIdx];
       if (!meal) return;
       delete meal.autoSwappedNote;
+      meal.isOverridden = false;
       var cur = meal.selectedOptionIndex || 0;
-      // If in standard (0 or 1), switch to Quick A (2). If in Quick (2 or 3), switch to Standard Main (0).
       if (cur === 0 || cur === 1) {
         meal.selectedOptionIndex = 2;
       } else {
@@ -1223,9 +1273,40 @@
       syncToCloud();
     }
 
+    function toggleMealOverride(mealIdx) {
+      var meal = state.plan[mealIdx];
+      if (!meal) return;
+      meal.isOverridden = !meal.isOverridden;
+      if (!meal.isOverridden) {
+        meal.actualMade = '';
+        delete meal.overrideNutrients;
+      }
+      renderPlan();
+      syncToCloud();
+    }
+
+    function updateActualMealText(mealIdx, val) {
+      if (state.plan && state.plan[mealIdx]) {
+        state.plan[mealIdx].actualMade = val;
+      }
+    }
+
+    function saveCustomMealText(mealIdx) {
+      var meal = state.plan[mealIdx];
+      if (!meal) return;
+      var text = meal.actualMade || '';
+      var detected = autoDetectNutrients(text);
+      if (detected.length > 0) {
+        meal.overrideNutrients = detected;
+      }
+      renderPlan();
+      syncToCloud();
+    }
+
     function revertAutoSwap(mealIdx) {
       var meal = state.plan[mealIdx];
       if (meal) {
+        meal.isOverridden = false;
         meal.selectedOptionIndex = 0;
         delete meal.autoSwappedNote;
         renderPlan();
@@ -1253,10 +1334,12 @@
       var card = document.createElement('div');
       card.className = 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm space-y-3.5';
 
-      var isQuickMode = optIdx >= 2;
-      var modeBadge = isQuickMode
-        ? '<button type="button" onclick="toggleEffortMode(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ Mode: 10-Min Quick</button>'
-        : '<button type="button" onclick="toggleEffortMode(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700">⚡ Mode: Standard Cook</button>';
+      var isQuickMode = optIdx >= 2 && !meal.isOverridden;
+      var modeBadge = meal.isOverridden
+        ? '<span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300">✏️ Custom Meal Mode</span>'
+        : (isQuickMode
+          ? '<button type="button" onclick="toggleEffortMode(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300">🛋️ Mode: 10-Min Quick</button>'
+          : '<button type="button" onclick="toggleEffortMode(' + idx + ')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200 dark:border-slate-700">⚡ Mode: Standard Cook</button>');
 
       var freshnessBadge = '';
       if (active.freshness === 'high') {
@@ -1267,7 +1350,18 @@
         freshnessBadge = '<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">❄️ Freezer/Pantry</span>';
       }
 
-      // Auto-Swap Alert Banner
+      var overrideBadge = meal.isOverridden 
+        ? '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700">↩️ Revert to Options</button>'
+        : '<button type="button" onclick="toggleMealOverride(' + idx + ')" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">✏️ Custom Meal</button>';
+
+      var overrideInput = '';
+      if (meal.isOverridden) {
+        overrideInput = '<div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 space-y-1.5">' +
+          '<label class="block text-[11px] font-bold text-amber-900 dark:text-amber-300 uppercase">Type custom meal replacement (Auto-detects nutrients):</label>' +
+          '<input type="text" value="' + (meal.actualMade || '') + '" oninput="updateActualMealText(' + idx + ', this.value)" onblur="saveCustomMealText(' + idx + ')" onkeydown="if(event.key===\'Enter\'){this.blur();}" placeholder="e.g. Ribeye steak with grilled vegetables, Takeout sushi, Leftovers..." class="w-full px-3 py-2 text-xs rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500">' +
+        '</div>';
+      }
+
       var autoSwapAlertHtml = '';
       if (meal.autoSwappedNote) {
         autoSwapAlertHtml = 
@@ -1280,37 +1374,36 @@
           '</div>';
       }
 
-      // 4-Option Selector Dropdown
       var fourOptionsHtml = '';
       if (meal.options && meal.options.length) {
         fourOptionsHtml = meal.options.map(function(opt, oIdx) {
-          var sel = (oIdx === optIdx) ? 'selected' : '';
-          var icon = (oIdx === 0) ? '⚡ Option 1 (Main Standard): ' : ((oIdx === 1) ? '💡 Option 2 (Standard Backup): ' : ((oIdx === 2) ? '🛋️ Option 3 (10-Min Quick A): ' : '🛋️ Option 4 (10-Min Quick B Alternate): '));
+          var sel = (!meal.isOverridden && oIdx === optIdx) ? 'selected' : '';
+          var icon = (oIdx === 0) ? '⚡ Option 1 (Main Standard): ' : ((oIdx === 1) ? '💡 Option 2 (Standard Backup): ' : ((oIdx === 2) ? '🛋️ Option 3 (10-Min Quick A): ' : '🛋️ Option 4 (10-Min Quick B): '));
           return '<option value="' + oIdx + '" ' + sel + '>' + icon + opt.title + '</option>';
         }).join('');
+        fourOptionsHtml += '<option value="custom" ' + (meal.isOverridden ? 'selected' : '') + '>✏️ Custom Meal Replacement...</option>';
       }
 
-      // 1. Picture Layout
+      var displayTitle = (meal.isOverridden && meal.actualMade) ? meal.actualMade : active.title;
       var pictureHtml = 
         '<div class="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800">' +
-          '<img src="' + (active.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80') + '" alt="' + active.title + '" class="w-full h-full object-cover">' +
+          '<img src="' + (active.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=700&q=80') + '" alt="' + displayTitle + '" class="w-full h-full object-cover">' +
           '<div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-black/20 to-transparent flex items-end p-3">' +
             '<div>' +
               '<span class="text-[10px] uppercase font-black tracking-wider text-red-400 block mb-0.5">🍳 ' + (active.gear || 'Stove / Skillet') + ' • ' + (active.timing || '15 min') + '</span>' +
-              '<h3 class="text-white font-black text-base drop-shadow-md leading-tight">' + active.title + '</h3>' +
+              '<h3 class="text-white font-black text-base drop-shadow-md leading-tight">' + displayTitle + '</h3>' +
             '</div>' +
           '</div>' +
         '</div>';
 
-      // 2. List of items needed to cook meal
       var itemsNeededLi = '';
-      if (active.itemsNeeded && active.itemsNeeded.length) {
+      if (active.itemsNeeded && active.itemsNeeded.length && !meal.isOverridden) {
         itemsNeededLi = active.itemsNeeded.map(function(itemText) {
           return '<li class="flex items-center gap-1.5"><span class="text-red-500 font-bold">•</span> <span>' + itemText + '</span></li>';
         }).join('');
       }
 
-      var itemsNeededBox = 
+      var itemsNeededBox = !meal.isOverridden ? (
         '<div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">' +
           '<div class="flex items-center justify-between">' +
             '<span class="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">' +
@@ -1321,17 +1414,17 @@
           '<ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium pl-1">' +
             itemsNeededLi +
           '</ul>' +
-        '</div>';
+        '</div>'
+      ) : '';
 
-      // 3. Step-by-Step Instructions
       var stepsLi = '';
-      if (active.steps && active.steps.length) {
+      if (active.steps && active.steps.length && !meal.isOverridden) {
         stepsLi = active.steps.map(function(s, sIdx) {
           return '<li class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed"><span class="font-black text-red-600 dark:text-red-400 mr-1">' + (sIdx + 1) + '.</span> ' + s + '</li>';
         }).join('');
       }
 
-      var instructionsBox = 
+      var instructionsBox = !meal.isOverridden ? (
         '<div class="space-y-2 pt-1">' +
           '<div class="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">' +
             '<span>👨‍🍳</span> Cooking Instructions:' +
@@ -1339,12 +1432,13 @@
           '<ol class="space-y-2 pl-1 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800">' +
             stepsLi +
           '</ol>' +
-        '</div>';
+        '</div>'
+      ) : '';
 
-      // Nutrient Pills
+      var nutrientList = (meal.isOverridden && meal.overrideNutrients) ? meal.overrideNutrients : (active.nutrients || []);
       var nutrientPills = '<div class="pt-1"><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">Dinner Nutrients:</span><div class="flex flex-wrap gap-1.5">';
       standardNutrients.forEach(function(n) {
-        var isTagActive = active.nutrients && active.nutrients.indexOf(n) > -1;
+        var isTagActive = nutrientList.indexOf(n) > -1;
         var btnStyle = isTagActive
           ? 'bg-blue-600 text-white font-bold shadow-sm'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium';
@@ -1358,20 +1452,19 @@
             freshnessBadge +
             modeBadge +
           '</div>' +
-          '<div class="text-[11px] font-bold text-slate-400">Day ' + (idx + 1) + ' of 7</div>' +
+          overrideBadge +
         '</div>' +
 
         autoSwapAlertHtml +
+        overrideInput +
 
-        // 4-Option Selector Dropdown Box
         '<div class="space-y-1">' +
-          '<label class="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Select From 4 Meal Options (Standard & 10-Min Quick):</label>' +
+          '<label class="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Select From 4 Preset Options or Custom:</label>' +
           '<select onchange="setMealOption(' + idx + ', this.value)" class="w-full text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl p-2.5 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500">' +
             fourOptionsHtml +
           '</select>' +
         '</div>' +
 
-        // Sequence: 1. Pictures -> 2. List of items needed -> 3. Instructions
         pictureHtml +
         itemsNeededBox +
         instructionsBox +
@@ -1857,13 +1950,17 @@
     function toggleMealNutrient(mealIdx, nutr) {
       var meal = state.plan[mealIdx];
       if (!meal) return;
-      var r = getActiveRecipe(meal);
-      if (!r.nutrients) r.nutrients = [];
-      var pos = r.nutrients.indexOf(nutr);
+      var activeList = (meal.isOverridden && meal.overrideNutrients) ? meal.overrideNutrients : (getActiveRecipe(meal).nutrients || []);
+      var pos = activeList.indexOf(nutr);
       if (pos > -1) {
-        r.nutrients.splice(pos, 1);
+        activeList.splice(pos, 1);
       } else {
-        r.nutrients.push(nutr);
+        activeList.push(nutr);
+      }
+      if (meal.isOverridden) {
+        meal.overrideNutrients = activeList;
+      } else {
+        getActiveRecipe(meal).nutrients = activeList;
       }
       renderPlan();
       syncToCloud();
@@ -1886,9 +1983,9 @@
       if (Array.isArray(state.plan)) {
         state.plan.forEach(function(meal) {
           if (!meal) return;
-          var activeRecipe = getActiveRecipe(meal);
-          if (activeRecipe && activeRecipe.nutrients && Array.isArray(activeRecipe.nutrients)) {
-            activeRecipe.nutrients.forEach(function(n) {
+          var activeList = (meal.isOverridden && meal.overrideNutrients) ? meal.overrideNutrients : (getActiveRecipe(meal).nutrients || []);
+          if (Array.isArray(activeList)) {
+            activeList.forEach(function(n) {
               if (counts[n] !== undefined) counts[n]++;
             });
           }
@@ -1948,10 +2045,14 @@
     function tagBoosterToToday(nutr) {
       var meal = state.plan[currentDayIndex];
       if (!meal) return;
-      var r = getActiveRecipe(meal);
-      if (!r.nutrients) r.nutrients = [];
-      if (r.nutrients.indexOf(nutr) === -1) {
-        r.nutrients.push(nutr);
+      var activeList = (meal.isOverridden && meal.overrideNutrients) ? meal.overrideNutrients : (getActiveRecipe(meal).nutrients || []);
+      if (activeList.indexOf(nutr) === -1) {
+        activeList.push(nutr);
+      }
+      if (meal.isOverridden) {
+        meal.overrideNutrients = activeList;
+      } else {
+        getActiveRecipe(meal).nutrients = activeList;
       }
       renderPlan();
       syncToCloud();
@@ -2162,76 +2263,3 @@
           manualGroceryItems: state.manualGroceryItems,
           checkedGroceryMap: state.checkedGroceryMap,
           pantry: state.pantry,
-          plan: state.plan,
-          thawDone: state.thawDone,
-          updatedAt: Date.now()
-        });
-      }
-    }
-
-    function updateCloudBadge(connected) {
-      var pill = document.getElementById('cloudStatusBtn');
-      var txt = document.getElementById('cloudStatusText');
-      if (!pill || !txt) return;
-      if (connected) {
-        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 cursor-pointer';
-        txt.textContent = 'Synced';
-      } else {
-        pill.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 cursor-pointer';
-        txt.textContent = 'Connecting...';
-      }
-    }
-
-    function init() {
-      var savedFam = localStorage.getItem('prince_family');
-      if (savedFam) {
-        try { state.family = JSON.parse(savedFam); } catch(e){}
-      }
-      var savedExtras = localStorage.getItem('prince_grocery_extras');
-      if (savedExtras) {
-        try { state.manualGroceryItems = JSON.parse(savedExtras); } catch(e){}
-      }
-      var savedPantry = localStorage.getItem('prantry_items') || localStorage.getItem('prince_pantry');
-      if (savedPantry) {
-        try { state.pantry = JSON.parse(savedPantry); } catch(e){}
-      } else {
-        state.pantry = VERIFIED_PANTRY_STOCK.slice();
-      }
-      var savedPlan = localStorage.getItem('prince_plan');
-      if (savedPlan) {
-        try { 
-          var parsedPlan = JSON.parse(savedPlan); 
-          if (parsedPlan && parsedPlan.length && parsedPlan[0].options) {
-            state.plan = parsedPlan;
-          } else {
-            generatePlan();
-          }
-        } catch(e){
-          generatePlan();
-        }
-      } else {
-        generatePlan();
-      }
-
-      var savedThaw = localStorage.getItem('prince_thaw_done');
-      if (savedThaw !== null) {
-        try { state.thawDone = JSON.parse(savedThaw); } catch(e){}
-      }
-
-      var savedTheme = localStorage.getItem('prince_theme') || 'light';
-      if (savedTheme === 'dark') document.documentElement.classList.add('dark');
-      updateThemeIcon();
-
-      renderFamilyCounters();
-      renderPantry();
-      renderGroceryList();
-      renderPlan();
-      updateThawBannerUI();
-      setupSwipeGestures();
-      initFirebase();
-    }
-
-    init();
-  </script>
-</body>
-</html>
